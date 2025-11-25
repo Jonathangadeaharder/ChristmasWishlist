@@ -4,7 +4,7 @@
  * Defines the interface for data repositories, enabling
  * dependency injection and easier testing.
  */
-import type { WishlistItem, GiftStatus, UserProfile } from '../types'
+import type { WishlistItem, GiftStatus, UserProfile, Suggestion } from '../types'
 
 /**
  * Unsubscribe function returned by real-time listeners
@@ -113,4 +113,28 @@ export interface IFriendsRepository {
    * Check if a user is already a friend
    */
   isFriend(userId: string, friendId: string): Promise<boolean>
+}
+
+/**
+ * Suggestions Repository Interface
+ * Allows friends to suggest gifts that the wishlist owner can't see
+ */
+export interface ISuggestionsRepository {
+  /**
+   * Subscribe to suggestions for a user (visible to friends only)
+   */
+  subscribeToSuggestions(userId: string, callback: (suggestions: Suggestion[]) => void): Unsubscribe
+
+  /**
+   * Add a suggestion for a user
+   */
+  addSuggestion(
+    userId: string,
+    suggestion: Omit<Suggestion, 'id' | 'createdAt'>
+  ): Promise<Suggestion>
+
+  /**
+   * Delete a suggestion (only the suggester can delete their own)
+   */
+  deleteSuggestion(userId: string, suggestionId: string): Promise<void>
 }

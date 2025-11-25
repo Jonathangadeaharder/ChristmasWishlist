@@ -92,6 +92,19 @@ export const translations = {
     youJoined: 'You joined this split!',
     waitingForApproval: 'Waiting for approval...',
 
+    // Suggestions
+    suggestions: 'Gift Suggestions',
+    suggestGift: 'Suggest a gift',
+    noSuggestions: 'No suggestions yet',
+    suggestionsInfo: 'Suggest gifts that only friends can see - not the wishlist owner!',
+    addSuggestion: 'Add Suggestion',
+    suggestionTitle: 'Gift idea',
+    suggestionDescription: 'Description (optional)',
+    suggestionUrl: 'Link (optional)',
+    suggestionPrice: 'Price (optional)',
+    suggestedBy: 'Suggested by',
+    deleteSuggestion: 'Delete suggestion',
+
     // Features
     createWishlists: 'Create wishlists',
     addFriends: 'Add friends',
@@ -202,6 +215,19 @@ export const translations = {
     youJoined: 'Du bist dabei!',
     waitingForApproval: 'Warte auf Bestätigung...',
 
+    // Suggestions
+    suggestions: 'Geschenkideen',
+    suggestGift: 'Geschenk vorschlagen',
+    noSuggestions: 'Noch keine Vorschläge',
+    suggestionsInfo: 'Schlage Geschenke vor, die nur Freunde sehen können - nicht der Beschenkte!',
+    addSuggestion: 'Vorschlag hinzufügen',
+    suggestionTitle: 'Geschenkidee',
+    suggestionDescription: 'Beschreibung (optional)',
+    suggestionUrl: 'Link (optional)',
+    suggestionPrice: 'Preis (optional)',
+    suggestedBy: 'Vorgeschlagen von',
+    deleteSuggestion: 'Vorschlag löschen',
+
     // Features
     createWishlists: 'Wunschzettel erstellen',
     addFriends: 'Freunde hinzufügen',
@@ -311,6 +337,19 @@ export const translations = {
     stopLookingForSplit: 'Dejar de buscar',
     youJoined: '¡Te uniste!',
     waitingForApproval: 'Esperando aprobación...',
+
+    // Suggestions
+    suggestions: 'Ideas de Regalos',
+    suggestGift: 'Sugerir un regalo',
+    noSuggestions: 'Aún no hay sugerencias',
+    suggestionsInfo: '¡Sugiere regalos que solo los amigos pueden ver - no el dueño de la lista!',
+    addSuggestion: 'Añadir Sugerencia',
+    suggestionTitle: 'Idea de regalo',
+    suggestionDescription: 'Descripción (opcional)',
+    suggestionUrl: 'Enlace (opcional)',
+    suggestionPrice: 'Precio (opcional)',
+    suggestedBy: 'Sugerido por',
+    deleteSuggestion: 'Eliminar sugerencia',
 
     // Features
     createWishlists: 'Crear listas',

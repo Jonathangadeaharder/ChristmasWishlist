@@ -35,6 +35,8 @@ export interface Suggestion {
   id: string
   title: string
   description?: string
+  url?: string
+  price?: string
   suggestedBy: string // uid
   suggestedByName: string
   createdAt: number

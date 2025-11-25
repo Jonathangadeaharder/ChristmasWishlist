@@ -8,18 +8,29 @@ import {
   getDoc,
   arrayUnion,
   arrayRemove,
+  deleteField,
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { COLLECTIONS, DOCUMENTS, QUERY_KEYS } from '../constants/firestore'
 import type { GiftStatus } from '../types'
 import { useEffect } from 'react'
 
+// Type for parent collection (wishlist or suggestions)
+export type ParentCollection = 'wishlist' | 'suggestions'
+
 /**
  * Hook for fetching and subscribing to gift status for a specific item
  * This is used on the friend's wishlist page to show if someone is getting an item
+ * @param parentCollection - 'wishlist' or 'suggestions' to specify the parent collection
  */
-export const useGiftStatus = (userId: string | undefined, itemId: string | undefined) => {
+export const useGiftStatus = (
+  userId: string | undefined,
+  itemId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   useEffect(() => {
     if (!userId || !itemId) return
@@ -28,14 +39,14 @@ export const useGiftStatus = (userId: string | undefined, itemId: string | undef
       db,
       COLLECTIONS.USERS,
       userId,
-      COLLECTIONS.WISHLIST,
+      collectionName,
       itemId,
       COLLECTIONS.GIFT_STATUS,
       DOCUMENTS.STATUS
     )
 
     const unsubscribe = onSnapshot(statusRef, docSnapshot => {
-      const queryKey = [QUERY_KEYS.GIFT_STATUS, userId, itemId]
+      const queryKey = [QUERY_KEYS.GIFT_STATUS, parentCollection, userId, itemId]
       if (docSnapshot.exists()) {
         queryClient.setQueryData(queryKey, docSnapshot.data() as GiftStatus)
       } else {
@@ -44,9 +55,9 @@ export const useGiftStatus = (userId: string | undefined, itemId: string | undef
     })
 
     return () => unsubscribe()
-  }, [userId, itemId, queryClient])
+  }, [userId, itemId, queryClient, collectionName])
 
-  const queryKey = [QUERY_KEYS.GIFT_STATUS, userId, itemId]
+  const queryKey = [QUERY_KEYS.GIFT_STATUS, parentCollection, userId, itemId]
 
   return useQuery({
     queryKey,
@@ -59,8 +70,13 @@ export const useGiftStatus = (userId: string | undefined, itemId: string | undef
 /**
  * Hook for marking an item as "I'll get this" with optimistic updates
  */
-export const useMarkItemAsTaken = (friendId: string | undefined) => {
+export const useMarkItemAsTaken = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async ({
@@ -78,7 +94,7 @@ export const useMarkItemAsTaken = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -91,7 +107,7 @@ export const useMarkItemAsTaken = (friendId: string | undefined) => {
       })
     },
     onMutate: async ({ itemId, takenBy, takenByName }) => {
-      const queryKey = [QUERY_KEYS.GIFT_STATUS, friendId, itemId]
+      const queryKey = [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId]
       await queryClient.cancelQueries({ queryKey })
 
       const previousStatus = queryClient.getQueryData<GiftStatus | null>(queryKey)
@@ -116,8 +132,13 @@ export const useMarkItemAsTaken = (friendId: string | undefined) => {
 /**
  * Hook for unmarking an item (cancel "I'll get this")
  */
-export const useUnmarkItemAsTaken = (friendId: string | undefined) => {
+export const useUnmarkItemAsTaken = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async (itemId: string) => {
@@ -127,7 +148,7 @@ export const useUnmarkItemAsTaken = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -136,7 +157,7 @@ export const useUnmarkItemAsTaken = (friendId: string | undefined) => {
       await deleteDoc(statusRef)
     },
     onMutate: async itemId => {
-      const queryKey = [QUERY_KEYS.GIFT_STATUS, friendId, itemId]
+      const queryKey = [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId]
       await queryClient.cancelQueries({ queryKey })
 
       const previousStatus = queryClient.getQueryData<GiftStatus | null>(queryKey)
@@ -157,8 +178,13 @@ export const useUnmarkItemAsTaken = (friendId: string | undefined) => {
 /**
  * Hook for toggling split request on a gift (open/close looking for co-gifters)
  */
-export const useToggleSplitRequest = (friendId: string | undefined) => {
+export const useToggleSplitRequest = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async ({ itemId, open }: { itemId: string; open: boolean }) => {
@@ -168,7 +194,7 @@ export const useToggleSplitRequest = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -176,11 +202,11 @@ export const useToggleSplitRequest = (friendId: string | undefined) => {
 
       await updateDoc(statusRef, {
         splitRequestOpen: open,
-        isSplit: open ? true : undefined,
+        ...(open ? { isSplit: true } : { isSplit: deleteField() }),
       })
     },
     onMutate: async ({ itemId, open }) => {
-      const queryKey = [QUERY_KEYS.GIFT_STATUS, friendId, itemId]
+      const queryKey = [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId]
       await queryClient.cancelQueries({ queryKey })
 
       const previousStatus = queryClient.getQueryData<GiftStatus | null>(queryKey)
@@ -189,7 +215,7 @@ export const useToggleSplitRequest = (friendId: string | undefined) => {
         queryClient.setQueryData<GiftStatus>(queryKey, {
           ...previousStatus,
           splitRequestOpen: open,
-          isSplit: open ? true : previousStatus.isSplit,
+          ...(open ? { isSplit: true } : {}),
         })
       }
 
@@ -206,8 +232,13 @@ export const useToggleSplitRequest = (friendId: string | undefined) => {
 /**
  * Hook for requesting to join a gift split
  */
-export const useRequestToJoinSplit = (friendId: string | undefined) => {
+export const useRequestToJoinSplit = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async ({
@@ -225,7 +256,7 @@ export const useRequestToJoinSplit = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -246,7 +277,9 @@ export const useRequestToJoinSplit = (friendId: string | undefined) => {
       })
     },
     onSuccess: (_data, { itemId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GIFT_STATUS, friendId, itemId] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId],
+      })
     },
   })
 }
@@ -254,8 +287,13 @@ export const useRequestToJoinSplit = (friendId: string | undefined) => {
 /**
  * Hook for confirming a pending contributor
  */
-export const useConfirmContributor = (friendId: string | undefined) => {
+export const useConfirmContributor = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async ({ itemId, contributorId }: { itemId: string; contributorId: string }) => {
@@ -265,7 +303,7 @@ export const useConfirmContributor = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -283,7 +321,9 @@ export const useConfirmContributor = (friendId: string | undefined) => {
       await updateDoc(statusRef, { contributors: updatedContributors })
     },
     onSuccess: (_data, { itemId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GIFT_STATUS, friendId, itemId] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId],
+      })
     },
   })
 }
@@ -291,8 +331,13 @@ export const useConfirmContributor = (friendId: string | undefined) => {
 /**
  * Hook for removing a contributor or leaving a split
  */
-export const useRemoveContributor = (friendId: string | undefined) => {
+export const useRemoveContributor = (
+  friendId: string | undefined,
+  parentCollection: ParentCollection = 'wishlist'
+) => {
   const queryClient = useQueryClient()
+  const collectionName =
+    parentCollection === 'wishlist' ? COLLECTIONS.WISHLIST : COLLECTIONS.SUGGESTIONS
 
   return useMutation({
     mutationFn: async ({ itemId, contributorId }: { itemId: string; contributorId: string }) => {
@@ -302,7 +347,7 @@ export const useRemoveContributor = (friendId: string | undefined) => {
         db,
         COLLECTIONS.USERS,
         friendId,
-        COLLECTIONS.WISHLIST,
+        collectionName,
         itemId,
         COLLECTIONS.GIFT_STATUS,
         DOCUMENTS.STATUS
@@ -322,7 +367,9 @@ export const useRemoveContributor = (friendId: string | undefined) => {
       }
     },
     onSuccess: (_data, { itemId }) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GIFT_STATUS, friendId, itemId] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GIFT_STATUS, parentCollection, friendId, itemId],
+      })
     },
   })
 }

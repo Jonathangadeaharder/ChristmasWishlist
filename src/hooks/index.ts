@@ -27,3 +27,7 @@ export {
   useConfirmContributor,
   useRemoveContributor,
 } from './useGiftStatus'
+export type { ParentCollection } from './useGiftStatus'
+
+// Suggestions hooks
+export { useSuggestions, useAddSuggestion, useDeleteSuggestion } from './useSuggestions'

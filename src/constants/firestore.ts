@@ -7,6 +7,7 @@ export const COLLECTIONS = {
   WISHLIST: 'wishlist',
   FRIENDS: 'friends',
   GIFT_STATUS: 'gift_status',
+  SUGGESTIONS: 'suggestions',
 } as const
 
 /**
@@ -25,6 +26,7 @@ export const QUERY_KEYS = {
   GIFT_STATUS: 'giftStatus',
   USER_PROFILE: 'userProfile',
   SEARCH_USERS: 'searchUsers',
+  SUGGESTIONS: 'suggestions',
 } as const
 
 /**
@@ -41,4 +43,7 @@ export const paths = {
   friends: (userId: string) => `${COLLECTIONS.USERS}/${userId}/${COLLECTIONS.FRIENDS}`,
   friend: (userId: string, friendId: string) =>
     `${COLLECTIONS.USERS}/${userId}/${COLLECTIONS.FRIENDS}/${friendId}`,
+  suggestions: (userId: string) => `${COLLECTIONS.USERS}/${userId}/${COLLECTIONS.SUGGESTIONS}`,
+  suggestion: (userId: string, suggestionId: string) =>
+    `${COLLECTIONS.USERS}/${userId}/${COLLECTIONS.SUGGESTIONS}/${suggestionId}`,
 } as const

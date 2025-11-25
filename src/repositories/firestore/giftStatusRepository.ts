@@ -12,6 +12,7 @@ import {
   getDoc,
   arrayUnion,
   arrayRemove,
+  deleteField,
 } from 'firebase/firestore'
 import { db } from '../../services/firebase'
 import { COLLECTIONS, DOCUMENTS } from '../../constants/firestore'
@@ -80,7 +81,7 @@ export const giftStatusRepository: IGiftStatusRepository = {
     const statusRef = getStatusRef(userId, itemId)
     await updateDoc(statusRef, {
       splitRequestOpen: open,
-      isSplit: open ? true : undefined, // Mark as split when opening request
+      ...(open ? { isSplit: true } : { isSplit: deleteField() }),
     })
   },
 
