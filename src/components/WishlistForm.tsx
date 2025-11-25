@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import type { WishlistItem } from '../types'
 import { Gift, Link as LinkIcon, DollarSign, Star, X, Loader2 } from 'lucide-react'
+import { useLanguage } from '../i18n'
 
 interface Props {
   onSubmit: (item: Omit<WishlistItem, 'id' | 'createdAt'>) => Promise<void>
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
+  const { t } = useLanguage()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [url, setUrl] = useState('')
@@ -34,13 +36,13 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
     <form onSubmit={handleSubmit} className="card-festive mb-6 p-6" data-testid="wishlist-form">
       <div className="mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
         <Gift className="text-red-500" size={24} />
-        <h3 className="text-lg font-bold text-gray-800">Add New Wish</h3>
+        <h3 className="text-lg font-bold text-gray-800">{t('addNewWish')}</h3>
       </div>
 
       <div className="space-y-4">
         <div>
           <label htmlFor="title" className="mb-2 block text-sm font-semibold text-gray-700">
-            What do you wish for? *
+            {t('whatDoYouWish')} *
           </label>
           <input
             id="title"
@@ -48,7 +50,7 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
             value={title}
             onChange={e => setTitle(e.target.value)}
             className="input-festive"
-            placeholder="e.g., Nintendo Switch, Cozy Sweater..."
+            placeholder={t('wishPlaceholder')}
             required
             data-testid="wishlist-title-input"
           />
@@ -56,14 +58,14 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
 
         <div>
           <label htmlFor="description" className="mb-2 block text-sm font-semibold text-gray-700">
-            Description
+            {t('description')}
           </label>
           <textarea
             id="description"
             value={description}
             onChange={e => setDescription(e.target.value)}
             className="input-festive min-h-[80px] resize-none"
-            placeholder="Add any details like color, size, or specific model..."
+            placeholder={t('descriptionPlaceholder')}
             rows={3}
             data-testid="wishlist-description-input"
           />
@@ -73,7 +75,7 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           <div>
             <label htmlFor="url" className="mb-2 block text-sm font-semibold text-gray-700">
               <LinkIcon size={14} className="mr-1 inline" />
-              Link (Optional)
+              {t('linkOptional')}
             </label>
             <input
               id="url"
@@ -88,7 +90,7 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           <div>
             <label htmlFor="price" className="mb-2 block text-sm font-semibold text-gray-700">
               <DollarSign size={14} className="mr-1 inline" />
-              Price (Optional)
+              {t('priceOptional')}
             </label>
             <input
               id="price"
@@ -105,7 +107,7 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         <div>
           <label htmlFor="priority" className="mb-2 block text-sm font-semibold text-gray-700">
             <Star size={14} className="mr-1 inline" />
-            How much do you want it?
+            {t('howMuchWant')}
           </label>
           <div className="grid grid-cols-3 gap-2">
             {(['low', 'medium', 'high'] as const).map(p => (
@@ -125,10 +127,10 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
                 }`}
               >
                 {p === 'low'
-                  ? '😊 Nice to have'
+                  ? `😊 ${t('niceToHave')}`
                   : p === 'medium'
-                    ? '🙏 Would love'
-                    : '🎯 Must have!'}
+                    ? `🙏 ${t('wouldLove')}`
+                    : `🎯 ${t('mustHave')}`}
               </button>
             ))}
           </div>
@@ -143,7 +145,7 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           data-testid="wishlist-cancel-button"
         >
           <X size={18} />
-          Cancel
+          {t('cancel')}
         </button>
         <button
           type="submit"
@@ -154,12 +156,12 @@ export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           {loading ? (
             <>
               <Loader2 size={18} className="animate-spin" />
-              Adding...
+              {t('loading')}
             </>
           ) : (
             <>
               <Gift size={18} />
-              Add to Wishlist
+              {t('addToWishlist')}
             </>
           )}
         </button>

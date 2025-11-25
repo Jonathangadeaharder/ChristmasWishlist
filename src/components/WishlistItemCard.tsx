@@ -1,6 +1,7 @@
 import React from 'react'
 import type { WishlistItem } from '../types'
 import { Trash2, ExternalLink, DollarSign, Star } from 'lucide-react'
+import { useLanguage } from '../i18n'
 
 interface Props {
   item: WishlistItem
@@ -8,13 +9,15 @@ interface Props {
 }
 
 export const WishlistItemCard: React.FC<Props> = ({ item, onDelete }) => {
+  const { t } = useLanguage()
+
   const priorityConfig = {
-    low: { class: 'badge badge-low', icon: null, label: 'Nice to have' },
-    medium: { class: 'badge badge-medium', icon: <Star size={12} />, label: 'Would love' },
+    low: { class: 'badge badge-low', icon: null, label: t('low') },
+    medium: { class: 'badge badge-medium', icon: <Star size={12} />, label: t('medium') },
     high: {
       class: 'badge badge-high',
       icon: <Star size={12} fill="currentColor" />,
-      label: 'Must have!',
+      label: t('high'),
     },
   }
 

@@ -1,37 +1,35 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { auth } from '../services/firebase'
 import type { WishlistItem } from '../types'
-import { getUserWishlist, addWishlistItem, deleteWishlistItem } from '../services/wishlist'
+import { useWishlist, useAddWishlistItem, useDeleteWishlistItem } from '../hooks'
 import { WishlistForm } from '../components/WishlistForm'
 import { WishlistItemCard } from '../components/WishlistItemCard'
-import { FriendList } from '../components/FriendList'
-import { Plus, Gift, LogOut, Sparkles } from 'lucide-react'
+import { LazyFriendList } from '../components/LazyFriendList'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { Plus, Gift, LogOut, Sparkles, Loader2 } from 'lucide-react'
+import { useLanguage } from '../i18n'
 
 const Dashboard: React.FC = () => {
+  const { t } = useLanguage()
   const { currentUser } = useAuth()
-  const [items, setItems] = useState<WishlistItem[]>([])
   const [showForm, setShowForm] = useState(false)
 
-  useEffect(() => {
-    if (currentUser) {
-      const unsubscribe = getUserWishlist(currentUser.uid, fetchedItems => {
-        setItems(fetchedItems)
-      })
-      return () => unsubscribe()
-    }
-  }, [currentUser])
+  // React Query hooks with real-time subscriptions
+  const { data: items = [], isLoading } = useWishlist(currentUser?.uid)
+  const addItemMutation = useAddWishlistItem(currentUser?.uid)
+  const deleteItemMutation = useDeleteWishlistItem(currentUser?.uid)
 
   const handleAddItem = async (item: Omit<WishlistItem, 'id' | 'createdAt'>) => {
     if (currentUser) {
-      await addWishlistItem(currentUser.uid, item)
+      await addItemMutation.mutateAsync(item)
       setShowForm(false)
     }
   }
 
   const handleDeleteItem = async (id: string) => {
-    if (currentUser && window.confirm('Are you sure you want to delete this item?')) {
-      await deleteWishlistItem(currentUser.uid, id)
+    if (currentUser && window.confirm(t('confirmDelete'))) {
+      deleteItemMutation.mutate(id)
     }
   }
 
@@ -43,11 +41,12 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-3">
             <span className="animate-float text-3xl">🎄</span>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Christmas Wishlist</h1>
-              <p className="text-xs text-red-100 opacity-80">Make your wishes come true</p>
+              <h1 className="text-xl font-bold tracking-tight">{t('appName')}</h1>
+              <p className="text-xs text-red-100 opacity-80">{t('tagline')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:flex">
               <Sparkles size={14} className="animate-twinkle" />
               <span className="text-sm" data-testid="user-email">
@@ -60,7 +59,7 @@ const Dashboard: React.FC = () => {
               data-testid="logout-button"
             >
               <LogOut size={16} />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">{t('logout')}</span>
             </button>
           </div>
         </div>
@@ -74,20 +73,21 @@ const Dashboard: React.FC = () => {
               <div>
                 <h2 className="flex items-center gap-2 text-3xl font-bold text-gray-800">
                   <Gift className="text-red-500" size={28} />
-                  My Wishlist
+                  {t('myWishlist')}
                 </h2>
                 <p className="mt-1 text-gray-500" data-testid="wishlist-count">
-                  {items.length} {items.length === 1 ? 'item' : 'items'} on your list
+                  {items.length} {items.length === 1 ? t('item') : t('items')} {t('onYourList')}
                 </p>
               </div>
               {!showForm && (
                 <button
+                  type="button"
                   onClick={() => setShowForm(true)}
                   className="btn-success group flex items-center gap-2"
                   data-testid="add-item-button"
                 >
                   <Plus size={20} className="transition-transform group-hover:rotate-90" />
-                  Add Item
+                  {t('addItem')}
                 </button>
               )}
             </div>
@@ -99,21 +99,23 @@ const Dashboard: React.FC = () => {
             )}
 
             <div className="space-y-4" data-testid="wishlist-items">
-              {items.length === 0 && !showForm ? (
+              {isLoading ? (
+                <div className="py-10 text-center">
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-green-600" />
+                  <p className="mt-2 text-gray-500">{t('loading')}</p>
+                </div>
+              ) : items.length === 0 && !showForm ? (
                 <div className="empty-state animate-slide-up" data-testid="empty-wishlist">
                   <div className="empty-state-icon">🎁</div>
-                  <h3 className="mb-2 text-xl font-semibold text-gray-700">
-                    Your wishlist is empty
-                  </h3>
-                  <p className="mb-6 text-gray-500">
-                    Start adding gifts you'd love to receive this Christmas!
-                  </p>
+                  <h3 className="mb-2 text-xl font-semibold text-gray-700">{t('emptyWishlist')}</h3>
+                  <p className="mb-6 text-gray-500">{t('startAdding')}</p>
                   <button
+                    type="button"
                     onClick={() => setShowForm(true)}
                     className="btn-success inline-flex items-center gap-2"
                     data-testid="add-first-item-button"
                   >
-                    <Plus size={20} /> Add your first item
+                    <Plus size={20} /> {t('addFirstItem')}
                   </button>
                 </div>
               ) : (
@@ -133,7 +135,7 @@ const Dashboard: React.FC = () => {
           {/* Friends Section */}
           <div className="lg:col-span-1">
             <div className="sticky top-4">
-              <FriendList />
+              <LazyFriendList />
             </div>
           </div>
         </div>
@@ -141,7 +143,7 @@ const Dashboard: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-gray-400">
-        <p>Made with ❤️ for the holiday season</p>
+        <p>{t('madeWithLove')}</p>
       </footer>
     </div>
   )

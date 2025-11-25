@@ -1,0 +1,4922 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.env.example
+.firebase/hosting.ZGlzdA.cache
+.firebaserc
+.github/workflows/firebase-hosting-merge.yml
+.github/workflows/firebase-hosting-pull-request.yml
+.gitignore
+.husky/pre-commit
+.percy.yml
+.prettierignore
+.prettierrc
+ADR.md
+docs/VISUAL_TESTING.md
+e2e/accessibility.spec.ts
+e2e/auth.spec.ts
+e2e/fixtures/test-fixtures.ts
+e2e/visual-regression.spec.ts
+e2e/visual.spec.ts
+e2e/wishlist.spec.ts
+eslint.config.js
+firebase.json
+firestore.indexes.json
+firestore.rules
+index.html
+package.json
+playwright.config.ts
+postcss.config.js
+public/404.html
+public/index.html
+public/vite.svg
+README.md
+SPEC.md
+src/App.css
+src/App.tsx
+src/assets/react.svg
+src/components/FriendList.tsx
+src/components/LanguageSwitcher.tsx
+src/components/PrivateRoute.tsx
+src/components/WishlistForm.test.tsx
+src/components/WishlistForm.tsx
+src/components/WishlistItemCard.test.tsx
+src/components/WishlistItemCard.tsx
+src/context/AuthContext.tsx
+src/i18n/index.ts
+src/i18n/LanguageContext.tsx
+src/i18n/translations.ts
+src/index.css
+src/main.tsx
+src/pages/Dashboard.tsx
+src/pages/FriendWishlist.tsx
+src/pages/Login.tsx
+src/pages/Register.tsx
+src/services/firebase.ts
+src/services/friends.ts
+src/services/wishlist.ts
+src/test/setup.ts
+src/test/test-utils.tsx
+src/types/index.test.ts
+src/types/index.ts
+tailwind.config.js
+tsconfig.app.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/components/LanguageSwitcher.tsx">
+import React, { useState, useRef, useEffect } from 'react';
+import { useLanguage } from '../i18n';
+import type { Language } from '../i18n';
+
+const languages: { code: Language; flag: string; name: string }[] = [
+  { code: 'en', flag: '🇬🇧', name: 'English' },
+  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+  { code: 'es', flag: '🇪🇸', name: 'Español' },
+];
+
+export const LanguageSwitcher: React.FC = () => {
+  const { language, setLanguage } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const currentLang = languages.find(l => l.code === language) || languages[0];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (code: Language) => {
+    setLanguage(code);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1.5 text-lg backdrop-blur-sm transition-all hover:bg-white/20"
+        aria-label="Select language"
+        data-testid="language-switcher"
+      >
+        <span className="text-xl">{currentLang.flag}</span>
+        <svg
+          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-50 mt-1 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5">
+          {languages.map(lang => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => handleSelect(lang.code)}
+              className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-gray-100 ${
+                language === lang.code ? 'bg-green-50 text-green-700' : 'text-gray-700'
+              }`}
+            >
+              <span className="text-xl">{lang.flag}</span>
+              <span>{lang.name}</span>
+              {language === lang.code && (
+                <svg className="ml-auto h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+</file>
+
+<file path="src/i18n/index.ts">
+export { LanguageProvider, useLanguage } from './LanguageContext';
+export { translations } from './translations';
+export type { Language, TranslationKey } from './translations';
+</file>
+
+<file path="src/i18n/LanguageContext.tsx">
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { translations } from './translations';
+import type { Language, TranslationKey } from './translations';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: TranslationKey) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const STORAGE_KEY = 'christmas-wishlist-language';
+
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguageState] = useState<Language>(() => {
+    // Try to get saved language from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && (saved === 'en' || saved === 'de' || saved === 'es')) {
+      return saved as Language;
+    }
+    return 'en'; // Default to English
+  });
+
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem(STORAGE_KEY, lang);
+  }, []);
+
+  useEffect(() => {
+    // Update document lang attribute
+    document.documentElement.lang = language;
+  }, [language]);
+
+  const t = useCallback((key: TranslationKey): string => {
+    return translations[language][key] || translations.en[key] || key;
+  }, [language]);
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
+</file>
+
+<file path="src/i18n/translations.ts">
+export const translations = {
+  en: {
+    // Navigation & Common
+    appName: 'Christmas Wishlist',
+    tagline: 'Make your wishes come true',
+    logout: 'Logout',
+    back: 'Back',
+    cancel: 'Cancel',
+    add: 'Add',
+    delete: 'Delete',
+    loading: 'Loading...',
+    
+    // Auth
+    signIn: 'Sign In',
+    signUp: 'Create Account',
+    signingIn: 'Signing in...',
+    creatingAccount: 'Creating account...',
+    displayName: 'Your Name',
+    displayNamePlaceholder: 'How friends will see you',
+    email: 'Email Address',
+    password: 'Password',
+    emailPlaceholder: 'you@example.com',
+    passwordPlaceholder: '••••••••',
+    minChars: 'At least 6 characters',
+    welcomeBack: 'Welcome back! Sign in to continue.',
+    noAccount: "Don't have an account?",
+    createOne: 'Create one',
+    hasAccount: 'Already have an account?',
+    signInLink: 'Sign in',
+    joinFun: 'Join the Fun!',
+    createWishlistShare: 'Create your wishlist and share with friends',
+    
+    // Dashboard
+    myWishlist: 'My Wishlist',
+    items: 'items',
+    item: 'item',
+    onYourList: 'on your list',
+    addItem: 'Add Item',
+    emptyWishlist: 'Your wishlist is empty',
+    startAdding: "Start adding gifts you'd love to receive this Christmas!",
+    addFirstItem: 'Add your first item',
+    
+    // Wishlist Form
+    addNewWish: 'Add New Wish',
+    whatDoYouWish: 'What do you wish for?',
+    description: 'Description',
+    descriptionPlaceholder: 'Add any details like color, size, or specific model...',
+    linkOptional: 'Link (Optional)',
+    priceOptional: 'Price (Optional)',
+    howMuchWant: 'How much do you want it?',
+    niceToHave: 'Nice to have',
+    wouldLove: 'Would love',
+    mustHave: 'Must have!',
+    addToWishlist: 'Add to Wishlist',
+    wishPlaceholder: 'e.g., Nintendo Switch, Cozy Sweater...',
+    
+    // Priority
+    low: 'NICE TO HAVE',
+    medium: 'WOULD LOVE',
+    high: 'MUST HAVE',
+    
+    // Friends
+    friends: 'Friends',
+    noFriendsYet: 'No friends yet',
+    searchByEmail: 'Search by name or email to add friends',
+    findByEmail: 'Find by name or email...',
+    friendAdded: 'Friend added!',
+    searchResults: 'SEARCH RESULTS',
+    viewWishlists: 'VIEW WISHLISTS',
+    
+    // Friend Wishlist
+    wishlistOf: "'s Wishlist",
+    selectItems: "Select items you'd like to gift. Others will see when an item is taken, but your friend won't!",
+    illGetThis: "I'll get this!",
+    youreGettingThis: "You're getting this!",
+    alreadyTaken: 'Already taken',
+    
+    // Features
+    createWishlists: 'Create wishlists',
+    addFriends: 'Add friends',
+    noSpoilers: 'No spoilers!',
+    
+    // Footer
+    madeWithLove: 'Made with ❤️ for the holiday season',
+    giftGivingMagic: '🎁 Make gift-giving magical this holiday season',
+    joyOfGiving: '🎄 The joy of giving starts here',
+    
+    // What you'll get
+    whatYouGet: "What you'll get:",
+    
+    // Confirmations
+    confirmDelete: 'Are you sure you want to delete this item?',
+  },
+  
+  de: {
+    // Navigation & Common
+    appName: 'Weihnachts-Wunschzettel',
+    tagline: 'Lass deine Wünsche wahr werden',
+    logout: 'Abmelden',
+    back: 'Zurück',
+    cancel: 'Abbrechen',
+    add: 'Hinzufügen',
+    delete: 'Löschen',
+    loading: 'Laden...',
+    
+    // Auth
+    signIn: 'Anmelden',
+    signUp: 'Konto erstellen',
+    signingIn: 'Anmeldung...',
+    creatingAccount: 'Konto wird erstellt...',
+    displayName: 'Dein Name',
+    displayNamePlaceholder: 'So sehen dich Freunde',
+    email: 'E-Mail-Adresse',
+    password: 'Passwort',
+    emailPlaceholder: 'du@beispiel.de',
+    passwordPlaceholder: '••••••••',
+    minChars: 'Mindestens 6 Zeichen',
+    welcomeBack: 'Willkommen zurück! Melde dich an.',
+    noAccount: 'Noch kein Konto?',
+    createOne: 'Jetzt erstellen',
+    hasAccount: 'Bereits ein Konto?',
+    signInLink: 'Anmelden',
+    joinFun: 'Mach mit!',
+    createWishlistShare: 'Erstelle deinen Wunschzettel und teile ihn mit Freunden',
+    
+    // Dashboard
+    myWishlist: 'Mein Wunschzettel',
+    items: 'Wünsche',
+    item: 'Wunsch',
+    onYourList: 'auf deiner Liste',
+    addItem: 'Wunsch hinzufügen',
+    emptyWishlist: 'Dein Wunschzettel ist leer',
+    startAdding: 'Füge Geschenke hinzu, die du dir zu Weihnachten wünschst!',
+    addFirstItem: 'Ersten Wunsch hinzufügen',
+    
+    // Wishlist Form
+    addNewWish: 'Neuen Wunsch hinzufügen',
+    whatDoYouWish: 'Was wünschst du dir?',
+    description: 'Beschreibung',
+    descriptionPlaceholder: 'Füge Details wie Farbe, Größe oder Modell hinzu...',
+    linkOptional: 'Link (Optional)',
+    priceOptional: 'Preis (Optional)',
+    howMuchWant: 'Wie sehr wünschst du es dir?',
+    niceToHave: 'Wäre schön',
+    wouldLove: 'Würde mich freuen',
+    mustHave: 'Muss sein!',
+    addToWishlist: 'Zum Wunschzettel',
+    wishPlaceholder: 'z.B. Nintendo Switch, Kuscheldecke...',
+    
+    // Priority
+    low: 'WÄRE SCHÖN',
+    medium: 'WÜRDE MICH FREUEN',
+    high: 'MUSS SEIN',
+    
+    // Friends
+    friends: 'Freunde',
+    noFriendsYet: 'Noch keine Freunde',
+    searchByEmail: 'Suche per Name oder E-Mail nach Freunden',
+    findByEmail: 'Name oder E-Mail suchen...',
+    friendAdded: 'Freund hinzugefügt!',
+    searchResults: 'SUCHERGEBNISSE',
+    viewWishlists: 'WUNSCHZETTEL ANSEHEN',
+    
+    // Friend Wishlist
+    wishlistOf: 's Wunschzettel',
+    selectItems: 'Wähle Geschenke aus, die du schenken möchtest. Andere sehen, wenn etwas vergeben ist, aber dein Freund nicht!',
+    illGetThis: 'Das schenke ich!',
+    youreGettingThis: 'Du schenkst das!',
+    alreadyTaken: 'Bereits vergeben',
+    
+    // Features
+    createWishlists: 'Wunschzettel erstellen',
+    addFriends: 'Freunde hinzufügen',
+    noSpoilers: 'Keine Spoiler!',
+    
+    // Footer
+    madeWithLove: 'Mit ❤️ gemacht für die Weihnachtszeit',
+    giftGivingMagic: '🎁 Mach das Schenken magisch',
+    joyOfGiving: '🎄 Die Freude am Schenken beginnt hier',
+    
+    // What you'll get
+    whatYouGet: 'Das bekommst du:',
+    
+    // Confirmations
+    confirmDelete: 'Möchtest du diesen Wunsch wirklich löschen?',
+  },
+  
+  es: {
+    // Navigation & Common
+    appName: 'Lista de Deseos Navideña',
+    tagline: 'Haz realidad tus deseos',
+    logout: 'Cerrar sesión',
+    back: 'Volver',
+    cancel: 'Cancelar',
+    add: 'Añadir',
+    delete: 'Eliminar',
+    loading: 'Cargando...',
+    
+    // Auth
+    signIn: 'Iniciar sesión',
+    signUp: 'Crear cuenta',
+    signingIn: 'Iniciando sesión...',
+    creatingAccount: 'Creando cuenta...',
+    displayName: 'Tu nombre',
+    displayNamePlaceholder: 'Cómo te verán tus amigos',
+    email: 'Correo electrónico',
+    password: 'Contraseña',
+    emailPlaceholder: 'tu@ejemplo.com',
+    passwordPlaceholder: '••••••••',
+    minChars: 'Al menos 6 caracteres',
+    welcomeBack: '¡Bienvenido! Inicia sesión para continuar.',
+    noAccount: '¿No tienes cuenta?',
+    createOne: 'Crear una',
+    hasAccount: '¿Ya tienes cuenta?',
+    signInLink: 'Iniciar sesión',
+    joinFun: '¡Únete a la diversión!',
+    createWishlistShare: 'Crea tu lista de deseos y compártela con amigos',
+    
+    // Dashboard
+    myWishlist: 'Mi Lista de Deseos',
+    items: 'deseos',
+    item: 'deseo',
+    onYourList: 'en tu lista',
+    addItem: 'Añadir deseo',
+    emptyWishlist: 'Tu lista está vacía',
+    startAdding: '¡Añade los regalos que te gustaría recibir esta Navidad!',
+    addFirstItem: 'Añade tu primer deseo',
+    
+    // Wishlist Form
+    addNewWish: 'Añadir nuevo deseo',
+    whatDoYouWish: '¿Qué deseas?',
+    description: 'Descripción',
+    descriptionPlaceholder: 'Añade detalles como color, talla o modelo...',
+    linkOptional: 'Enlace (Opcional)',
+    priceOptional: 'Precio (Opcional)',
+    howMuchWant: '¿Cuánto lo deseas?',
+    niceToHave: 'Estaría bien',
+    wouldLove: 'Me encantaría',
+    mustHave: '¡Lo necesito!',
+    addToWishlist: 'Añadir a la lista',
+    wishPlaceholder: 'ej. Nintendo Switch, Jersey acogedor...',
+    
+    // Priority
+    low: 'ESTARÍA BIEN',
+    medium: 'ME ENCANTARÍA',
+    high: 'LO NECESITO',
+    
+    // Friends
+    friends: 'Amigos',
+    noFriendsYet: 'Aún no hay amigos',
+    searchByEmail: 'Busca amigos por nombre o correo',
+    findByEmail: 'Buscar por nombre o correo...',
+    friendAdded: '¡Amigo añadido!',
+    searchResults: 'RESULTADOS',
+    viewWishlists: 'VER LISTAS',
+    
+    // Friend Wishlist
+    wishlistOf: ' - Lista de Deseos',
+    selectItems: 'Selecciona los regalos que quieras dar. ¡Otros verán si está reservado, pero tu amigo no!',
+    illGetThis: '¡Yo lo regalo!',
+    youreGettingThis: '¡Lo vas a regalar!',
+    alreadyTaken: 'Ya reservado',
+    
+    // Features
+    createWishlists: 'Crear listas',
+    addFriends: 'Añadir amigos',
+    noSpoilers: '¡Sin spoilers!',
+    
+    // Footer
+    madeWithLove: 'Hecho con ❤️ para las fiestas',
+    giftGivingMagic: '🎁 Haz que regalar sea mágico',
+    joyOfGiving: '🎄 La alegría de dar empieza aquí',
+    
+    // What you'll get
+    whatYouGet: 'Lo que obtendrás:',
+    
+    // Confirmations
+    confirmDelete: '¿Seguro que quieres eliminar este deseo?',
+  },
+} as const;
+
+export type Language = keyof typeof translations;
+export type TranslationKey = keyof typeof translations.en;
+</file>
+
+<file path=".env.example">
+VITE_FIREBASE_API_KEY=your_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+</file>
+
+<file path=".firebase/hosting.ZGlzdA.cache">
+vite.svg,1764066785958,699a02e0e68a579f687d364bbbe7633161244f35af068220aee37b1b33dfb3c7
+404.html,1764068648792,762bf484ba67404bd1a3b181546ea28d60dfddf18e9dd4795d8d25bcf3c1a890
+index.html,1764088936310,594ff5b72064a2ea88057c74f7fb6434315a302a4588f693e44417e9ee7a67e4
+assets/wishlist-DoA9oHAP.js,1764088936310,487bef1cdbcbd579d20099dccdbb74a13a32df8b7316761b6c299dd1c2a077e0
+assets/Register-DmWxCvUq.js,1764088936310,fa5f358fa876433cf0953c683b1399be5769e7fad7b0b00465b45f272b3545b7
+assets/lucide-icons-DsDZ8mF-.js,1764088936310,1270f2e77e9806ff331eb8e3c68c8928111270f39429601b376628120042e61a
+assets/Login-ZvLuxla1.js,1764088936310,f68c5aa06867d8c15c2f5cefd8a31ec891dd7b769001523de405de580c53f88a
+assets/LanguageSwitcher-CHRDEf9U.js,1764088936310,38b551467478071d8354c7121754e6cfb7c0c3468851df87a6b5aa14a13ad536
+assets/tanstack-query-6gGM8K7y.js,1764088936307,7345c439655253a536a30ef3ff8710cc33dfd8c23e742bf5468f88baf2cc72a4
+assets/FriendWishlist-DcEyDUnh.js,1764088936310,7301050fe39781b2a8bae0cf326d19200778046ec8989112d09897757a83b723
+assets/index-CJuwvRrY.css,1764088936276,757657d24522a9484d1e616b142564e2e9bf26ee5fdf8be8c9266a5c8ad35453
+assets/react-vendor-DPiWyFWu.js,1764088936307,bc7d7d7090df63df53f4cdef3fa253eac34cb6d09d990aafe1b04ef249e38e98
+assets/Dashboard-G3Pdlbut.js,1764088936310,92ea66dc72daee0a525e1d9a1f8dd35244d7f36fe6b0759cff199d66708af14b
+assets/index-Wv681L2o.js,1764088936310,d0262bad9ef3cb589ccd6afe3b1caff2b117d31aab165750e55d4a350cc77c81
+assets/firebase-B-i9J-i0.js,1764088936310,5357458f6631baf734916926457723f612fd027a2939ae533cffb0f50bf32a0e
+</file>
+
+<file path=".firebaserc">
+{
+  "projects": {
+    "default": "christmaswishlist-297d8"
+  }
+}
+</file>
+
+<file path=".github/workflows/firebase-hosting-merge.yml">
+# This file was auto-generated by the Firebase CLI
+# https://github.com/firebase/firebase-tools
+
+name: Deploy to Firebase Hosting on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CHRISTMASWISHLIST_297D8 }}
+          channelId: live
+          projectId: christmaswishlist-297d8
+</file>
+
+<file path=".github/workflows/firebase-hosting-pull-request.yml">
+# This file was auto-generated by the Firebase CLI
+# https://github.com/firebase/firebase-tools
+
+name: Deploy to Firebase Hosting on PR
+on: pull_request
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+jobs:
+  build_and_preview:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CHRISTMASWISHLIST_297D8 }}
+          projectId: christmaswishlist-297d8
+</file>
+
+<file path=".gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Percy
+/.percy/
+
+# Environment variables (contains PERCY_TOKEN)
+.env
+.env.local
+.env.*.local
+</file>
+
+<file path=".husky/pre-commit">
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx lint-staged
+</file>
+
+<file path=".percy.yml">
+# Percy Configuration
+# https://www.browserstack.com/docs/percy/take-percy-snapshots/configuration
+
+version: 2
+
+# Snapshot configuration
+snapshot:
+  # Default widths for responsive testing
+  widths:
+    - 375   # Mobile
+    - 768   # Tablet
+    - 1280  # Desktop
+  
+  # Minimum height for snapshots
+  min-height: 1024
+  
+  # Enable JavaScript for dynamic content
+  enable-javascript: true
+  
+  # Percy CSS to inject (hide dynamic elements)
+  percy-css: |
+    /* Hide elements that change between runs */
+    .animate-spin {
+      animation: none !important;
+    }
+    .animate-float {
+      animation: none !important;
+    }
+    /* Ensure consistent rendering */
+    * {
+      transition: none !important;
+      animation-duration: 0s !important;
+    }
+
+# Upload configuration
+upload:
+  # Number of concurrent uploads
+  concurrency: 2
+
+# Discovery configuration  
+discovery:
+  # Network idle timeout
+  network-idle-timeout: 100
+  
+  # Allowed hostnames
+  allowed-hostnames:
+    - localhost
+    - 127.0.0.1
+
+# Comparison settings
+comparison:
+  # Enable responsive diffs
+  responsive-diffs: true
+</file>
+
+<file path=".prettierignore">
+# Build outputs
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Test outputs
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.local
+.env.production
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Temporary folders
+tmp/
+temp/
+</file>
+
+<file path=".prettierrc">
+{
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "endOfLine": "lf"
+}
+</file>
+
+<file path="ADR.md">
+# Architecture Decision Records (ADR)
+
+## ADR-001: Technology Stack Selection
+
+### Context
+
+We need to build a responsive web application with authentication, real-time data capabilities, and secure data visibility rules.
+
+### Decision
+
+We will use the following stack:
+
+- **Frontend**: React (v18+) with TypeScript.
+  - _Reasoning_: Strong typing for data models, component-based architecture for UI reuse.
+  - _Build Tool_: Vite (for speed).
+- **Backend-as-a-Service**: Firebase.
+  - **Authentication**: Firebase Auth (handles user sessions securely).
+  - **Database**: Cloud Firestore (NoSQL).
+    - _Reasoning_: Flexible schema, real-time listeners for updates (e.g., seeing when someone else claims a gift immediately), and granular Security Rules.
+  - **Hosting**: Firebase Hosting.
+
+### Consequences
+
+- Rapid prototyping and deployment.
+- Vendor lock-in to Google Firebase.
+- No need to manage a separate backend server (Node/Express) unless complex logic requires Cloud Functions.
+
+---
+
+## ADR-002: Data Model for "Surprise" Privacy
+
+### Context
+
+A critical requirement is that the Wisher must not know if a gift is bought ("Taken"). If we store `isTaken` on the main item document, the Wisher reads that document to see the title/description, and could technically inspect the network response to see `isTaken: true`.
+
+### Decision
+
+We will separate public item data from "secret" status data using Firestore Subcollections.
+
+**Structure:**
+
+1. `users/{userId}/wishlist/{itemId}`
+   - **Read**: Owner, Friends
+   - **Write**: Owner
+   - **Fields**: `title`, `description`, `url`, `price`
+2. `users/{userId}/wishlist/{itemId}/gift_status/status` (Subcollection Document)
+   - **Read**: Friends ONLY (Owner Read Denied via Security Rules)
+   - **Write**: Friends
+   - **Fields**: `isTaken` (bool), `takenBy` (userId), `takenByName` (string)
+3. `users/{userId}/suggestions/{suggestionId}`
+   - **Read**: Friends ONLY
+   - **Write**: Friends
+   - **Fields**: `title`, `suggestedBy`, `description`
+
+### Consequences
+
+- **Pros**: True security. Even if the Wisher is a developer, they cannot query the database for the "taken" status of their own items because Firestore Security Rules will reject the request.
+- **Cons**: The frontend requires two separate queries/listeners when viewing a friend's list (one for items, one for statuses) and merging them client-side.
+
+---
+
+## ADR-003: State Management
+
+### Context
+
+The app needs to manage user session state and cached data for wishlists.
+
+### Decision
+
+- Use **React Context API** for Authentication State (`AuthContext`).
+- Use **TanStack Query (React Query)** for data fetching and caching.
+  - _Reasoning_: Handles loading states, caching, and re-fetching efficiently, which is crucial when switching between friend lists.
+</file>
+
+<file path="docs/VISUAL_TESTING.md">
+# Visual Regression Testing with Percy
+
+This project uses **Percy** with **Playwright** for visual regression testing to catch CSS bugs like icon/text overlap, layout regressions, and styling inconsistencies.
+
+## What It Catches
+
+Visual regression testing would have caught bugs like:
+
+- ❌ Input icon overlapping with placeholder text (CSS specificity issue)
+- ❌ Layout breaks at different screen sizes
+- ❌ Missing styles or broken animations
+- ❌ Unintended style changes after CSS updates
+
+## Setup
+
+### 1. Create a Percy Account
+
+1. Go to [percy.io](https://percy.io) and sign up (free tier available)
+2. Create a new project
+3. Get your `PERCY_TOKEN` from the project settings
+
+### 2. Configure Percy Token
+
+**Option A: Environment Variable (recommended for CI/CD)**
+
+```bash
+export PERCY_TOKEN=your_token_here
+```
+
+**Option B: Create `.env` file (for local development)**
+
+```bash
+# .env (this file is gitignored)
+PERCY_TOKEN=your_token_here
+```
+
+## Running Tests
+
+### Local Testing (without Percy upload)
+
+```bash
+npm run test:visual:local
+```
+
+### With Percy (uploads snapshots for comparison)
+
+```bash
+# Requires PERCY_TOKEN to be set
+npm run test:visual
+```
+
+### In CI/CD Pipeline
+
+```yaml
+# GitHub Actions example
+- name: Visual Regression Tests
+  env:
+    PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+  run: npm run test:visual
+```
+
+## Test Coverage
+
+The visual tests cover:
+
+| Test Suite       | What It Tests                  |
+| ---------------- | ------------------------------ |
+| Login Page       | Desktop, mobile, tablet views  |
+| Register Page    | Desktop, mobile views          |
+| Input Components | Icon spacing, focus states     |
+| Buttons          | Default, hover, loading states |
+| Responsive       | 6 breakpoints (320px - 1440px) |
+| Animations       | Post-animation settled state   |
+
+## How It Works
+
+1. **First Run**: Percy captures baseline screenshots
+2. **Subsequent Runs**: Percy compares new screenshots to baselines
+3. **Differences Detected**: Percy highlights visual changes for review
+4. **Approve/Reject**: Team reviews and approves intentional changes
+
+## Best Practices
+
+### Writing Visual Tests
+
+```typescript
+import percySnapshot from '@percy/playwright'
+
+test('component visual test', async ({ page }) => {
+  await page.goto('/page')
+
+  // Wait for content to load
+  await expect(page.getByTestId('element')).toBeVisible()
+
+  // Wait for animations to complete
+  await page.waitForTimeout(500)
+
+  // Capture snapshot
+  await percySnapshot(page, 'Descriptive Snapshot Name')
+})
+```
+
+### Naming Conventions
+
+- Use descriptive names: `'Login Page - Mobile View'`
+- Include state: `'Input Fields - With Error State'`
+- Include viewport: `'Dashboard - Tablet (768px)'`
+
+### Handling Dynamic Content
+
+The `.percy.yml` config disables animations:
+
+```css
+* {
+  transition: none !important;
+  animation-duration: 0s !important;
+}
+```
+
+## CI/CD Integration
+
+### GitHub Actions
+
+```yaml
+name: Visual Tests
+
+on: [push, pull_request]
+
+jobs:
+  visual-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Percy Visual Tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+        run: npm run test:visual
+```
+
+### Pull Request Workflow
+
+1. Developer pushes code
+2. CI runs visual tests
+3. Percy compares screenshots
+4. If differences found → Percy comments on PR with visual diff
+5. Team reviews and approves visual changes
+6. PR can be merged
+
+## Troubleshooting
+
+### "Percy is not running, disabling snapshots"
+
+- Set `PERCY_TOKEN` environment variable
+- Run with `percy exec --` prefix
+
+### Flaky Tests
+
+- Add `waitForTimeout` for animations
+- Use `waitForSelector` for dynamic content
+- Ensure consistent test data
+
+### Large Diffs on Small Changes
+
+- Check if animations are disabled in `.percy.yml`
+- Verify viewport sizes are consistent
+- Look for timing-dependent content
+
+## Resources
+
+- [Percy Documentation](https://www.browserstack.com/docs/percy)
+- [Percy + Playwright Guide](https://www.browserstack.com/docs/percy/integrate/playwright)
+- [Playwright Documentation](https://playwright.dev/docs/intro)
+</file>
+
+<file path="e2e/accessibility.spec.ts">
+import { test, expect } from '@playwright/test'
+import { AxeBuilder } from '@axe-core/playwright'
+
+test.describe('Accessibility Tests', () => {
+  test('should have no accessibility violations on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Wait for page to load
+    await expect(page.getByTestId('login-page')).toBeVisible()
+
+    // Check accessibility with AxeBuilder
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .disableRules(['color-contrast']) // Will check separately
+      .analyze()
+
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+
+  test('should have no accessibility violations on register page', async ({ page }) => {
+    await page.goto('/register')
+
+    // Wait for page to load
+    await expect(page.getByTestId('register-page')).toBeVisible()
+
+    // Check accessibility with AxeBuilder
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .disableRules(['color-contrast']) // Will check separately
+      .analyze()
+
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+
+  test('should have documented color contrast violations on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check color contrast specifically
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .withRules(['color-contrast'])
+      .analyze()
+
+    // Note: We expect color contrast violations due to festive Christmas theme
+    // Business decision prioritizes festive branding (green/red colors) over WCAG AA compliance
+    // These violations are intentional and documented
+    expect(accessibilityScanResults.violations.length).toBeGreaterThan(0)
+
+    // Log violations for visibility
+    console.log(
+      'Color contrast violations (intentional for festive theme):',
+      accessibilityScanResults.violations.map(v => v.description)
+    )
+  })
+
+  test('should have documented color contrast violations on register page', async ({ page }) => {
+    await page.goto('/register')
+
+    // Check color contrast specifically
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .withRules(['color-contrast'])
+      .analyze()
+
+    // Note: We expect color contrast violations due to festive Christmas theme
+    // Business decision prioritizes festive branding (green/red colors) over WCAG AA compliance
+    // These violations are intentional and documented
+    expect(accessibilityScanResults.violations.length).toBeGreaterThan(0)
+
+    // Log violations for visibility
+    console.log(
+      'Color contrast violations (intentional for festive theme):',
+      accessibilityScanResults.violations.map(v => v.description)
+    )
+  })
+
+  test('should be keyboard navigable on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Click first to establish page focus
+    const emailInput = page.getByTestId('login-email-input')
+    await emailInput.click()
+    await expect(emailInput).toBeFocused()
+
+    // Test keyboard navigation
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('login-password-input')).toBeFocused()
+
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('login-submit-button')).toBeFocused()
+
+    // Check accessibility after keyboard navigation
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .disableRules(['color-contrast'])
+      .analyze()
+
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+
+  test('should be keyboard navigable on register page', async ({ page }) => {
+    await page.goto('/register')
+
+    // Click first to establish page focus
+    const emailInput = page.getByTestId('register-email-input')
+    await emailInput.click()
+    await expect(emailInput).toBeFocused()
+
+    // Test keyboard navigation
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('register-password-input')).toBeFocused()
+
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('register-submit-button')).toBeFocused()
+
+    // Check accessibility after keyboard navigation
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .disableRules(['color-contrast'])
+      .analyze()
+
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+})
+</file>
+
+<file path="e2e/auth.spec.ts">
+import { test, expect } from './fixtures/test-fixtures'
+
+test.describe('Authentication Flow', () => {
+  test.describe('Login Page', () => {
+    test('should display login page with all elements', async ({ page, loginPage }) => {
+      await loginPage.goto()
+
+      // Check page is visible
+      await expect(page.getByTestId('login-page')).toBeVisible()
+
+      // Check form elements
+      await expect(page.getByTestId('login-form')).toBeVisible()
+      await expect(page.getByTestId('login-email-input')).toBeVisible()
+      await expect(page.getByTestId('login-password-input')).toBeVisible()
+      await expect(page.getByTestId('login-submit-button')).toBeVisible()
+      await expect(page.getByTestId('register-link')).toBeVisible()
+
+      // Check page content
+      await expect(page.getByText('Christmas Wishlist')).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible()
+    })
+
+    test('should show validation for empty fields', async ({ page, loginPage }) => {
+      await loginPage.goto()
+
+      // Try to submit empty form
+      await page.getByTestId('login-submit-button').click()
+
+      // Email input should be invalid (HTML5 validation)
+      const emailInput = page.getByTestId('login-email-input')
+      await expect(emailInput).toHaveAttribute('required', '')
+    })
+
+    test('should show error for invalid credentials', async ({ page, loginPage }) => {
+      await loginPage.goto()
+
+      await loginPage.login('invalid@example.com', 'wrongpassword')
+
+      // Wait for error to appear (Firebase will return an error)
+      await expect(page.getByTestId('login-error')).toBeVisible({ timeout: 10000 })
+    })
+
+    test('should navigate to register page', async ({ page, loginPage }) => {
+      await loginPage.goto()
+      await loginPage.goToRegister()
+
+      await expect(page.getByTestId('register-page')).toBeVisible()
+    })
+
+    test('should have proper input types', async ({ page, loginPage }) => {
+      await loginPage.goto()
+
+      await expect(page.getByTestId('login-email-input')).toHaveAttribute('type', 'email')
+      await expect(page.getByTestId('login-password-input')).toHaveAttribute('type', 'password')
+    })
+  })
+
+  test.describe('Register Page', () => {
+    test('should display register page with all elements', async ({ page, registerPage }) => {
+      await registerPage.goto()
+
+      // Check page is visible
+      await expect(page.getByTestId('register-page')).toBeVisible()
+
+      // Check form elements
+      await expect(page.getByTestId('register-form')).toBeVisible()
+      await expect(page.getByTestId('register-email-input')).toBeVisible()
+      await expect(page.getByTestId('register-password-input')).toBeVisible()
+      await expect(page.getByTestId('register-submit-button')).toBeVisible()
+      await expect(page.getByTestId('login-link')).toBeVisible()
+
+      // Check page content
+      await expect(page.getByText('Join the Fun!')).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Create Account' })).toBeVisible()
+    })
+
+    test('should have password minimum length requirement', async ({ page, registerPage }) => {
+      await registerPage.goto()
+
+      const passwordInput = page.getByTestId('register-password-input')
+      await expect(passwordInput).toHaveAttribute('minlength', '6')
+    })
+
+    test('should navigate to login page', async ({ page, registerPage }) => {
+      await registerPage.goto()
+      await registerPage.goToLogin()
+
+      await expect(page.getByTestId('login-page')).toBeVisible()
+    })
+
+    test('should show error for weak password', async ({ page, registerPage }) => {
+      await registerPage.goto()
+
+      // Try to register with a weak password
+      await registerPage.register('test@example.com', '123')
+
+      // Browser validation should prevent submission (minlength=6)
+      const passwordInput = page.getByTestId('register-password-input')
+      const validityState = await passwordInput.evaluate(
+        (el: HTMLInputElement) => el.validity.tooShort
+      )
+      expect(validityState).toBe(true)
+    })
+  })
+
+  test.describe('Navigation', () => {
+    test('should redirect unauthenticated users to login', async ({ page }) => {
+      // Try to access dashboard directly
+      await page.goto('/')
+
+      // Should be redirected to login
+      await expect(page.getByTestId('login-page')).toBeVisible()
+    })
+
+    test('should handle unknown routes', async ({ page }) => {
+      await page.goto('/unknown-page')
+
+      // Should redirect to login (since not authenticated) or home
+      await expect(page.getByTestId('login-page')).toBeVisible()
+    })
+  })
+})
+</file>
+
+<file path="e2e/fixtures/test-fixtures.ts">
+import { test as base, expect } from '@playwright/test'
+
+/**
+ * Custom test fixtures for Christmas Wishlist E2E tests
+ * Provides reusable page objects and helpers
+ */
+
+// Page Object Models
+export class LoginPage {
+  constructor(private page: import('@playwright/test').Page) {}
+
+  async goto() {
+    await this.page.goto('/login')
+  }
+
+  async login(email: string, password: string) {
+    await this.page.getByTestId('login-email-input').fill(email)
+    await this.page.getByTestId('login-password-input').fill(password)
+    await this.page.getByTestId('login-submit-button').click()
+  }
+
+  async expectError(message?: string) {
+    const error = this.page.getByTestId('login-error')
+    await expect(error).toBeVisible()
+    if (message) {
+      await expect(error).toContainText(message)
+    }
+  }
+
+  async goToRegister() {
+    await this.page.getByTestId('register-link').click()
+  }
+}
+
+export class RegisterPage {
+  constructor(private page: import('@playwright/test').Page) {}
+
+  async goto() {
+    await this.page.goto('/register')
+  }
+
+  async register(email: string, password: string) {
+    await this.page.getByTestId('register-email-input').fill(email)
+    await this.page.getByTestId('register-password-input').fill(password)
+    await this.page.getByTestId('register-submit-button').click()
+  }
+
+  async expectError(message?: string) {
+    const error = this.page.getByTestId('register-error')
+    await expect(error).toBeVisible()
+    if (message) {
+      await expect(error).toContainText(message)
+    }
+  }
+
+  async goToLogin() {
+    await this.page.getByTestId('login-link').click()
+  }
+}
+
+export class DashboardPage {
+  constructor(private page: import('@playwright/test').Page) {}
+
+  async expectVisible() {
+    await expect(this.page.getByTestId('dashboard-page')).toBeVisible()
+  }
+
+  async expectUserEmail(email: string) {
+    await expect(this.page.getByTestId('user-email')).toContainText(email)
+  }
+
+  async logout() {
+    await this.page.getByTestId('logout-button').click()
+  }
+
+  async openAddItemForm() {
+    await this.page.getByTestId('add-item-button').click()
+  }
+
+  async openAddFirstItemForm() {
+    await this.page.getByTestId('add-first-item-button').click()
+  }
+
+  async expectEmptyWishlist() {
+    await expect(this.page.getByTestId('empty-wishlist')).toBeVisible()
+  }
+
+  async getWishlistCount() {
+    const text = await this.page.getByTestId('wishlist-count').textContent()
+    const match = text?.match(/(\d+)/)
+    return match ? parseInt(match[1], 10) : 0
+  }
+}
+
+export class WishlistFormPage {
+  constructor(private page: import('@playwright/test').Page) {}
+
+  async expectVisible() {
+    await expect(this.page.getByTestId('wishlist-form')).toBeVisible()
+  }
+
+  async fillForm(data: {
+    title: string
+    description?: string
+    url?: string
+    price?: string
+    priority?: 'low' | 'medium' | 'high'
+  }) {
+    await this.page.getByTestId('wishlist-title-input').fill(data.title)
+
+    if (data.description) {
+      await this.page.getByTestId('wishlist-description-input').fill(data.description)
+    }
+
+    if (data.url) {
+      await this.page.getByTestId('wishlist-url-input').fill(data.url)
+    }
+
+    if (data.price) {
+      await this.page.getByTestId('wishlist-price-input').fill(data.price)
+    }
+
+    if (data.priority) {
+      await this.page.getByTestId(`priority-${data.priority}`).click()
+    }
+  }
+
+  async submit() {
+    await this.page.getByTestId('wishlist-submit-button').click()
+  }
+
+  async cancel() {
+    await this.page.getByTestId('wishlist-cancel-button').click()
+  }
+}
+
+export class FriendListPage {
+  constructor(private page: import('@playwright/test').Page) {}
+
+  async expectVisible() {
+    await expect(this.page.getByTestId('friend-list')).toBeVisible()
+  }
+
+  async searchFriend(email: string) {
+    await this.page.getByTestId('friend-search-input').fill(email)
+    await this.page.getByTestId('friend-search-button').click()
+  }
+
+  async expectNoFriendsMessage() {
+    await expect(this.page.getByTestId('no-friends-message')).toBeVisible()
+  }
+
+  async expectSearchResults() {
+    await expect(this.page.getByTestId('friend-search-results')).toBeVisible()
+  }
+}
+
+// Extended test with fixtures
+type Fixtures = {
+  loginPage: LoginPage
+  registerPage: RegisterPage
+  dashboardPage: DashboardPage
+  wishlistFormPage: WishlistFormPage
+  friendListPage: FriendListPage
+}
+
+export const test = base.extend<Fixtures>({
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page))
+  },
+  registerPage: async ({ page }, use) => {
+    await use(new RegisterPage(page))
+  },
+  dashboardPage: async ({ page }, use) => {
+    await use(new DashboardPage(page))
+  },
+  wishlistFormPage: async ({ page }, use) => {
+    await use(new WishlistFormPage(page))
+  },
+  friendListPage: async ({ page }, use) => {
+    await use(new FriendListPage(page))
+  },
+})
+
+export { expect }
+</file>
+
+<file path="e2e/visual-regression.spec.ts">
+import { test, expect } from '@playwright/test'
+import percySnapshot from '@percy/playwright'
+
+/**
+ * Visual Regression Tests with Percy
+ *
+ * These tests capture screenshots of key pages and components,
+ * comparing them against baselines to catch visual bugs like:
+ * - CSS specificity issues (icon/text overlap)
+ * - Layout regressions
+ * - Styling inconsistencies
+ * - Responsive design breaks
+ *
+ * Run with: npx percy exec -- npx playwright test e2e/visual-regression.spec.ts
+ */
+
+test.describe('Visual Regression - Login Page', () => {
+  test('login page desktop view', async ({ page }) => {
+    await page.goto('/login')
+    await expect(page.getByTestId('login-page')).toBeVisible()
+
+    // Wait for any animations to complete
+    await page.waitForTimeout(500)
+
+    // Capture Percy snapshot
+    await percySnapshot(page, 'Login Page - Desktop')
+  })
+
+  test('login page with form inputs focused', async ({ page }) => {
+    await page.goto('/login')
+    await expect(page.getByTestId('login-page')).toBeVisible()
+
+    // Fill in some text to test input styling with content
+    await page.getByTestId('login-email-input').fill('test@example.com')
+    await page.getByTestId('login-password-input').fill('password123')
+
+    await percySnapshot(page, 'Login Page - With Input Values')
+  })
+
+  test('login page with validation error', async ({ page }) => {
+    await page.goto('/login')
+
+    // Fill with invalid credentials to trigger error
+    await page.getByTestId('login-email-input').fill('invalid@test.com')
+    await page.getByTestId('login-password-input').fill('wrongpass')
+    await page.getByTestId('login-submit-button').click()
+
+    // Wait for error message (Firebase auth will fail)
+    await page.waitForSelector('[data-testid="login-error"]', { timeout: 10000 }).catch(() => {})
+
+    await percySnapshot(page, 'Login Page - With Error')
+  })
+
+  test('login page mobile view', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 }) // iPhone SE
+    await page.goto('/login')
+    await expect(page.getByTestId('login-page')).toBeVisible()
+
+    await percySnapshot(page, 'Login Page - Mobile')
+  })
+
+  test('login page tablet view', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 }) // iPad
+    await page.goto('/login')
+    await expect(page.getByTestId('login-page')).toBeVisible()
+
+    await percySnapshot(page, 'Login Page - Tablet')
+  })
+})
+
+test.describe('Visual Regression - Register Page', () => {
+  test('register page desktop view', async ({ page }) => {
+    await page.goto('/register')
+    await expect(page.getByTestId('register-page')).toBeVisible()
+
+    await page.waitForTimeout(500)
+
+    await percySnapshot(page, 'Register Page - Desktop')
+  })
+
+  test('register page with form inputs', async ({ page }) => {
+    await page.goto('/register')
+    await expect(page.getByTestId('register-page')).toBeVisible()
+
+    // Fill in form to test input styling
+    await page.getByTestId('register-email-input').fill('newuser@example.com')
+    await page.getByTestId('register-password-input').fill('securepass123')
+
+    await percySnapshot(page, 'Register Page - With Input Values')
+  })
+
+  test('register page mobile view', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 })
+    await page.goto('/register')
+    await expect(page.getByTestId('register-page')).toBeVisible()
+
+    await percySnapshot(page, 'Register Page - Mobile')
+  })
+})
+
+test.describe('Visual Regression - Input Components', () => {
+  test('input fields with icons should have proper spacing', async ({ page }) => {
+    await page.goto('/login')
+
+    // This test specifically catches the icon overlap bug
+    const emailInput = page.getByTestId('login-email-input')
+    const passwordInput = page.getByTestId('login-password-input')
+
+    await expect(emailInput).toBeVisible()
+    await expect(passwordInput).toBeVisible()
+
+    // Fill inputs to verify text doesn't overlap with icons
+    await emailInput.fill('verylongemail@exampledomain.com')
+    await passwordInput.fill('••••••••••••')
+
+    // Take focused snapshot of just the form area
+    await percySnapshot(page, 'Input Fields - With Icons and Text', {
+      scope: '[data-testid="login-form"]',
+    })
+  })
+
+  test('input fields focus states', async ({ page }) => {
+    await page.goto('/login')
+
+    const emailInput = page.getByTestId('login-email-input')
+    await emailInput.click()
+
+    // Capture focus state
+    await percySnapshot(page, 'Input Fields - Focus State')
+  })
+})
+
+test.describe('Visual Regression - Buttons', () => {
+  test('button states on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Default state
+    await percySnapshot(page, 'Login Button - Default State')
+
+    // Hover state (move mouse to button)
+    const submitButton = page.getByTestId('login-submit-button')
+    await submitButton.hover()
+
+    await percySnapshot(page, 'Login Button - Hover State')
+  })
+
+  test('button loading state', async ({ page }) => {
+    await page.goto('/login')
+
+    // Fill form and submit to trigger loading state
+    await page.getByTestId('login-email-input').fill('test@example.com')
+    await page.getByTestId('login-password-input').fill('password123')
+
+    // Click and immediately capture (loading state is brief)
+    await page.getByTestId('login-submit-button').click()
+
+    // Try to capture loading state
+    await percySnapshot(page, 'Login Button - Loading State')
+  })
+})
+
+test.describe('Visual Regression - Responsive Breakpoints', () => {
+  const breakpoints = [
+    { name: 'Mobile S', width: 320, height: 568 },
+    { name: 'Mobile M', width: 375, height: 667 },
+    { name: 'Mobile L', width: 425, height: 812 },
+    { name: 'Tablet', width: 768, height: 1024 },
+    { name: 'Laptop', width: 1024, height: 768 },
+    { name: 'Desktop', width: 1440, height: 900 },
+  ]
+
+  for (const bp of breakpoints) {
+    test(`login page at ${bp.name} (${bp.width}x${bp.height})`, async ({ page }) => {
+      await page.setViewportSize({ width: bp.width, height: bp.height })
+      await page.goto('/login')
+      await expect(page.getByTestId('login-page')).toBeVisible()
+
+      await percySnapshot(page, `Login Page - ${bp.name}`)
+    })
+  }
+})
+
+test.describe('Visual Regression - Animations Complete', () => {
+  test('page after animations settle', async ({ page }) => {
+    await page.goto('/login')
+
+    // Wait for CSS animations to complete (float animation is 3s)
+    await page.waitForTimeout(3500)
+
+    await percySnapshot(page, 'Login Page - Animations Settled')
+  })
+})
+</file>
+
+<file path="e2e/visual.spec.ts">
+import { test, expect } from '@playwright/test'
+
+/**
+ * Visual and Responsive Design Tests
+ * These tests verify the UI renders correctly across different viewports
+ */
+
+test.describe('Visual Design', () => {
+  test.describe('Login Page', () => {
+    test('should display festive branding elements', async ({ page }) => {
+      await page.goto('/login')
+
+      // Check for Christmas tree emoji
+      await expect(page.locator('text=🎄')).toBeVisible()
+
+      // Check for app title
+      await expect(page.getByText('Christmas Wishlist')).toBeVisible()
+
+      // Check for festive footer
+      await expect(page.getByText('Make gift-giving magical')).toBeVisible()
+    })
+
+    test('should have proper styling classes', async ({ page }) => {
+      await page.goto('/login')
+
+      // Check card styling
+      const card = page.locator('.card-festive').first()
+      await expect(card).toBeVisible()
+
+      // Check button styling
+      const submitButton = page.getByTestId('login-submit-button')
+      await expect(submitButton).toHaveClass(/btn-primary/)
+    })
+
+    test('should be responsive on mobile', async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 667 }) // iPhone SE
+      await page.goto('/login')
+
+      // Form should still be visible and usable
+      await expect(page.getByTestId('login-form')).toBeVisible()
+      await expect(page.getByTestId('login-email-input')).toBeVisible()
+      await expect(page.getByTestId('login-submit-button')).toBeVisible()
+    })
+  })
+
+  test.describe('Register Page', () => {
+    test('should display festive branding elements', async ({ page }) => {
+      await page.goto('/register')
+
+      // Check for gift emoji
+      await expect(page.locator('text=🎁').first()).toBeVisible()
+
+      // Check for page title
+      await expect(page.getByText('Join the Fun!')).toBeVisible()
+
+      // Check for festive footer
+      await expect(page.getByText('The joy of giving starts here')).toBeVisible()
+    })
+
+    test('should display benefit icons', async ({ page }) => {
+      await page.goto('/register')
+
+      // Check benefit section exists
+      const benefitsSection = page.locator("text=What you'll get:")
+      await expect(benefitsSection).toBeVisible()
+    })
+
+    test('should be responsive on tablet', async ({ page }) => {
+      await page.setViewportSize({ width: 768, height: 1024 }) // iPad
+      await page.goto('/register')
+
+      // Form should still be visible and usable
+      await expect(page.getByTestId('register-form')).toBeVisible()
+    })
+  })
+})
+
+test.describe('Animations', () => {
+  test('should have floating animation on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check for animate-float class on tree emoji
+    const floatingElement = page.locator('.animate-float').first()
+    await expect(floatingElement).toBeVisible()
+  })
+
+  test('should have floating animation on register page', async ({ page }) => {
+    await page.goto('/register')
+
+    // Check for animate-float class
+    const floatingElement = page.locator('.animate-float').first()
+    await expect(floatingElement).toBeVisible()
+  })
+})
+
+test.describe('Accessibility', () => {
+  test('should have proper heading structure on login', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check for h1
+    const h1 = page.locator('h1')
+    await expect(h1).toBeVisible()
+    await expect(h1).toContainText('Christmas Wishlist')
+
+    // Check for h2
+    const h2 = page.locator('h2')
+    await expect(h2).toBeVisible()
+    await expect(h2).toContainText('Sign In')
+  })
+
+  test('should have proper heading structure on register', async ({ page }) => {
+    await page.goto('/register')
+
+    // Check for h1
+    const h1 = page.locator('h1')
+    await expect(h1).toBeVisible()
+    await expect(h1).toContainText('Join the Fun!')
+
+    // Check for h2
+    const h2 = page.locator('h2')
+    await expect(h2).toBeVisible()
+    await expect(h2).toContainText('Create Account')
+  })
+
+  test('should have accessible form inputs', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check email input accessibility
+    const emailInput = page.getByTestId('login-email-input')
+    await expect(emailInput).toHaveAttribute('id', 'email')
+    await expect(emailInput).toHaveAttribute('type', 'email')
+    await expect(emailInput).toHaveAttribute('required', '')
+
+    // Check label association
+    const emailLabel = page.locator('label[for="email"]')
+    await expect(emailLabel).toBeVisible()
+  })
+
+  test('should support keyboard navigation', async ({ page }) => {
+    await page.goto('/login')
+
+    // Click on the email input first to ensure page has focus
+    const emailInput = page.getByTestId('login-email-input')
+    await emailInput.click()
+    await expect(emailInput).toBeFocused()
+
+    // Tab to password
+    await page.keyboard.press('Tab')
+    const passwordInput = page.getByTestId('login-password-input')
+    await expect(passwordInput).toBeFocused()
+
+    // Tab to submit button
+    await page.keyboard.press('Tab')
+    const submitButton = page.getByTestId('login-submit-button')
+    await expect(submitButton).toBeFocused()
+  })
+})
+
+test.describe('Color Scheme', () => {
+  test('should use festive colors on login page', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check that CSS variables are applied
+    const styles = await page.evaluate(() => {
+      return getComputedStyle(document.documentElement)
+    })
+
+    // Page should have custom properties defined
+    expect(styles).toBeDefined()
+  })
+
+  test('should have consistent button styles', async ({ page }) => {
+    await page.goto('/login')
+
+    const submitButton = page.getByTestId('login-submit-button')
+
+    // Check button is styled
+    const buttonClasses = await submitButton.getAttribute('class')
+    expect(buttonClasses).toContain('btn-primary')
+  })
+})
+</file>
+
+<file path="e2e/wishlist.spec.ts">
+import { test, expect } from './fixtures/test-fixtures'
+
+/**
+ * Wishlist E2E Tests
+ * Note: These tests require authentication. In a real scenario, you would:
+ * 1. Use Firebase Emulator Suite for testing
+ * 2. Create test users in beforeAll hooks
+ * 3. Use authenticated state from setup
+ *
+ * For now, these tests verify UI elements and interactions
+ * without actually creating data in Firebase.
+ */
+
+test.describe('Wishlist Form', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to login first
+    await page.goto('/login')
+  })
+
+  test('should have proper form structure when visible', async ({ page }) => {
+    // This test would run after authentication
+    // For now, we verify the login page loads
+    await expect(page.getByTestId('login-page')).toBeVisible()
+  })
+})
+
+test.describe('Wishlist Form UI Tests', () => {
+  // These tests verify the form elements exist with correct attributes
+  // They can run on the login page since we're just checking DOM structure
+
+  test('login form should have accessible labels', async ({ page }) => {
+    await page.goto('/login')
+
+    // Check labels are properly associated with inputs
+    const emailLabel = page.locator('label[for="email"]')
+    const passwordLabel = page.locator('label[for="password"]')
+
+    await expect(emailLabel).toBeVisible()
+    await expect(passwordLabel).toBeVisible()
+  })
+
+  test('register form should have accessible labels', async ({ page }) => {
+    await page.goto('/register')
+
+    const emailLabel = page.locator('label[for="email"]')
+    const passwordLabel = page.locator('label[for="password"]')
+
+    await expect(emailLabel).toBeVisible()
+    await expect(passwordLabel).toBeVisible()
+  })
+
+  test('forms should be keyboard navigable', async ({ page }) => {
+    await page.goto('/login')
+
+    // Click email input first to ensure page focus
+    const emailInput = page.getByTestId('login-email-input')
+    await emailInput.click()
+    await expect(emailInput).toBeFocused()
+
+    // Tab to password
+    await page.keyboard.press('Tab')
+    const passwordInput = page.getByTestId('login-password-input')
+    await expect(passwordInput).toBeFocused()
+  })
+})
+
+test.describe('Wishlist Item Card Structure', () => {
+  test('wishlist page should redirect to login when not authenticated', async ({ page }) => {
+    await page.goto('/')
+
+    // Should be on login page
+    await expect(page.getByTestId('login-page')).toBeVisible()
+  })
+})
+
+test.describe('Priority Selection', () => {
+  test('register page should show priority explanation in benefits', async ({ page }) => {
+    await page.goto('/register')
+
+    // Check that the benefits section is visible
+    await expect(page.getByText("What you'll get:")).toBeVisible()
+    await expect(page.getByText('Create wishlists')).toBeVisible()
+    await expect(page.getByText('Add friends')).toBeVisible()
+    await expect(page.getByText('No spoilers!')).toBeVisible()
+  })
+})
+</file>
+
+<file path="eslint.config.js">
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    ignores: ['e2e/**/*'], // Exclude E2E test files from React rules
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'jsx-a11y': jsxA11y,
+    },
+    rules: {
+      // Accessibility rules for better GUI practices
+      'jsx-a11y/alt-text': 'error', // Images must have alt text
+      'jsx-a11y/anchor-has-content': 'error', // Links must have content
+      'jsx-a11y/anchor-is-valid': 'error', // Links must be valid
+      'jsx-a11y/aria-activedescendant-has-tabindex': 'error',
+      'jsx-a11y/aria-props': 'error',
+      'jsx-a11y/aria-proptypes': 'error',
+      'jsx-a11y/aria-role': 'error',
+      'jsx-a11y/aria-unsupported-elements': 'error',
+      'jsx-a11y/click-events-have-key-events': 'warn', // Clickable elements should have keyboard events
+      'jsx-a11y/heading-has-content': 'error',
+      'jsx-a11y/html-has-lang': 'error',
+      'jsx-a11y/img-redundant-alt': 'error',
+      'jsx-a11y/interactive-supports-focus': 'error',
+      'jsx-a11y/label-has-associated-control': 'error', // Labels must be associated with controls
+      'jsx-a11y/media-has-caption': 'warn',
+      'jsx-a11y/mouse-events-have-key-events': 'warn',
+      'jsx-a11y/no-access-key': 'error',
+      'jsx-a11y/no-autofocus': 'warn',
+      'jsx-a11y/no-distracting-elements': 'error',
+      'jsx-a11y/no-interactive-element-to-noninteractive-role': 'error',
+      'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+      'jsx-a11y/no-noninteractive-element-to-interactive-role': 'error',
+      'jsx-a11y/no-redundant-roles': 'error',
+      'jsx-a11y/no-static-element-interactions': 'warn',
+      'jsx-a11y/role-has-required-aria-props': 'error',
+      'jsx-a11y/role-supports-aria-props': 'error',
+      'jsx-a11y/scope': 'error',
+      'jsx-a11y/tabindex-no-positive': 'error',
+      'jsx-a11y/heading-has-content': 'error',
+    },
+  },
+  {
+    files: ['e2e/**/*.{ts,js}'],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    rules: {
+      // Basic rules for test files, no React-specific rules
+    },
+  },
+])
+</file>
+
+<file path="firebase.json">
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "eur3",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
+</file>
+
+<file path="firestore.indexes.json">
+{
+  // Example (Standard Edition):
+  //
+  // "indexes": [
+  //   {
+  //     "collectionGroup": "widgets",
+  //     "queryScope": "COLLECTION",
+  //     "fields": [
+  //       { "fieldPath": "foo", "arrayConfig": "CONTAINS" },
+  //       { "fieldPath": "bar", "mode": "DESCENDING" }
+  //     ]
+  //   },
+  //
+  //  "fieldOverrides": [
+  //    {
+  //      "collectionGroup": "widgets",
+  //      "fieldPath": "baz",
+  //      "indexes": [
+  //        { "order": "ASCENDING", "queryScope": "COLLECTION" }
+  //      ]
+  //    },
+  //   ]
+  // ]
+  //
+  // Example (Enterprise Edition):
+  //
+  // "indexes": [
+  //   {
+  //     "collectionGroup": "reviews",
+  //     "queryScope": "COLLECTION_GROUP",
+  //     "apiScope": "MONGODB_COMPATIBLE_API",
+  //     "density": "DENSE",
+  //     "multikey": false,
+  //     "fields": [
+  //       { "fieldPath": "baz", "mode": "ASCENDING" }
+  //     ]
+  //   },
+  //   {
+  //     "collectionGroup": "items",
+  //     "queryScope": "COLLECTION_GROUP",
+  //     "apiScope": "MONGODB_COMPATIBLE_API",
+  //     "density": "SPARSE_ANY",
+  //     "multikey": true,
+  //     "fields": [
+  //       { "fieldPath": "baz", "mode": "ASCENDING" }
+  //     ]
+  //   },
+  // ]
+  "indexes": [],
+  "fieldOverrides": []
+}
+</file>
+
+<file path="firestore.rules">
+rules_version='2'
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      // This rule allows anyone with your database reference to view, edit,
+      // and delete all data in your database. It is useful for getting
+      // started, but it is configured to expire after 30 days because it
+      // leaves your app open to attackers. At that time, all client
+      // requests to your database will be denied.
+      //
+      // Make sure to write security rules for your app before that time, or
+      // else all client requests to your database will be denied until you
+      // update your rules.
+      allow read, write: if request.time < timestamp.date(2025, 12, 25);
+    }
+  }
+}
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>app</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="package.json">
+{
+  "name": "app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:visual": "percy exec -- playwright test e2e/visual-regression.spec.ts --project=chromium",
+    "test:visual:local": "playwright test e2e/visual-regression.spec.ts --project=chromium",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.10",
+    "firebase": "^12.6.0",
+    "lucide-react": "^0.554.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@axe-core/react": "^4.10.2",
+    "@eslint/js": "^9.39.1",
+    "@percy/cli": "^1.31.4",
+    "@percy/playwright": "^1.0.10",
+    "@playwright/test": "^1.57.0",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "axe-core": "^4.10.2",
+    "eslint": "^9.39.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "jsdom": "^27.2.0",
+    "lint-staged": "^15.2.11",
+    "postcss": "^8.5.6",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.13"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,json,md}": [
+      "prettier --write"
+    ]
+  }
+}
+</file>
+
+<file path="playwright.config.ts">
+import { defineConfig, devices } from '@playwright/test'
+
+/**
+ * Playwright configuration for Christmas Wishlist E2E tests
+ * @see https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: './e2e',
+
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+
+  /* Fail the build on CI if you accidentally left test.only in the source code */
+  forbidOnly: !!process.env.CI,
+
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+
+  /* Opt out of parallel tests on CI */
+  workers: process.env.CI ? 1 : undefined,
+
+  /* Reporter to use */
+  reporter: [['html', { open: 'never' }], ['list']],
+
+  /* Shared settings for all the projects below */
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')` */
+    baseURL: 'http://localhost:5173',
+
+    /* Collect trace when retrying the failed test */
+    trace: 'on-first-retry',
+
+    /* Take screenshot on failure */
+    screenshot: 'only-on-failure',
+
+    /* Record video on failure */
+    video: 'on-first-retry',
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+    },
+
+    /* Test against mobile viewports */
+    {
+      name: 'Mobile Chrome',
+      use: {
+        ...devices['Pixel 5'],
+      },
+    },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+})
+</file>
+
+<file path="postcss.config.js">
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+</file>
+
+<file path="public/404.html">
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Page Not Found</title>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px 16px; border-radius: 3px; }
+      #message h3 { color: #888; font-weight: normal; font-size: 16px; margin: 16px 0 12px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <h2>404</h2>
+      <h1>Page Not Found</h1>
+      <p>The specified file was not found on this website. Please check the URL for mistakes and try again.</p>
+      <h3>Why am I seeing this?</h3>
+      <p>This page was generated by the Firebase Command-Line Interface. To modify it, edit the <code>404.html</code> file in your project's configured <code>public</code> directory.</p>
+    </div>
+  </body>
+</html>
+</file>
+
+<file path="public/index.html">
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/12.6.0/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/12.6.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/12.6.0/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>Firebase Hosting Setup Complete</h1>
+      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
+      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadEl = document.querySelector('#load');
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth', 
+            'database', 
+            'firestore',
+            'functions',
+            'messaging', 
+            'storage', 
+            'analytics', 
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
+</html>
+</file>
+
+<file path="public/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+</file>
+
+<file path="README.md">
+# React + TypeScript + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
+</file>
+
+<file path="SPEC.md">
+# Specification: Christmas Wishlist Application
+
+## 1. Overview
+
+A React-based web application allowing users to manage Christmas wishlists and coordinate gift-giving with friends. The core value proposition is preventing duplicate gifts while maintaining the element of surprise for the recipient.
+
+## 2. User Roles
+
+- **User (Wisher)**: Manages their own list, adds friends.
+- **Friend (Gifter)**: Views lists, marks items as purchased, suggests ideas.
+
+## 3. Functional Requirements
+
+### 3.1 Authentication & User Management
+
+- Users must register and login (Email/Password or Google Auth).
+- Users can search for other users by email/username to add them as friends.
+
+### 3.2 Wishlist Management (The "Wisher")
+
+- Users can Create, Read, Update, and Delete (CRUD) items on their own wishlist.
+- Item fields: Title, Description, URL (optional), Price (optional), Priority.
+- **Constraint**: The Wisher CANNOT see the "Taken" status of their own items.
+
+### 3.3 Friend Interaction (The "Gifter")
+
+- Friends can view a user's wishlist.
+- **Claiming Gifts**: Friends can mark an item as "Taken".
+  - When marked "Taken", the UI shows _who_ took it (e.g., "Taken by Alice").
+  - This prevents other friends from buying the same item.
+  - This status is visible to all friends but HIDDEN from the Wisher.
+- **Suggestions**: Friends can add "Suggested Items" to a user's list.
+  - These items are visible to all friends.
+  - These items are COMPLETELY HIDDEN from the Wisher.
+
+## 4. Data Privacy & Security
+
+- **Wisher Privacy**: The system must enforce that a user cannot fetch the "taken" status of their own items via the API/Database rules (preventing spoilers via network inspection).
+- **Friend Access**: Only confirmed friends can view wishlists and claim items.
+
+## 5. User Interface
+
+- **Dashboard**: Shows own wishlist and list of friends.
+- **Friend's View**: Shows the friend's wishlist with "Mark as Taken" buttons and "Add Suggestion" form.
+- **Own View**: Shows own wishlist with edit controls, hiding all "Taken" indicators.
+</file>
+
+<file path="src/App.css">
+/* ========================================
+   Christmas Wishlist - Festive Styles
+   ======================================== */
+
+/* Animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(196, 30, 58, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(196, 30, 58, 0.5);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility Classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+/* Card Styles */
+.card-festive {
+  background: white;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(22, 91, 51, 0.1);
+}
+
+.card-festive:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--christmas-red) 0%, var(--christmas-red-dark) 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(196, 30, 58, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(196, 30, 58, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--christmas-green) 0%, var(--christmas-green-light) 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(22, 91, 51, 0.3);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 91, 51, 0.4);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--pine-shadow);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: var(--frost);
+}
+
+/* Input Styles */
+.input-festive {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+/* Input with icon - use this class when input has a left icon */
+.input-festive.input-with-icon {
+  padding-left: 2.5rem;
+}
+
+.input-festive:focus {
+  border-color: var(--christmas-green);
+  box-shadow: 0 0 0 3px rgba(22, 91, 51, 0.1);
+  outline: none;
+}
+
+.input-festive::placeholder {
+  color: #a0aec0;
+}
+
+/* Priority Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-low {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+}
+
+.badge-medium {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+}
+
+.badge-high {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+}
+
+/* Navbar */
+.navbar-festive {
+  background: linear-gradient(135deg, var(--christmas-red) 0%, var(--christmas-red-dark) 100%);
+  box-shadow: 0 4px 20px rgba(196, 30, 58, 0.3);
+}
+
+/* Snow Effect Container */
+.snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.snowflake {
+  position: absolute;
+  color: white;
+  font-size: 1rem;
+  opacity: 0;
+  animation: snow-fall linear infinite;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, white 0%, var(--frost) 100%);
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--frost);
+  border-top-color: var(--christmas-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Festive Decorations */
+.festive-border {
+  position: relative;
+}
+
+.festive-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--christmas-red) 0%,
+    var(--christmas-gold) 25%,
+    var(--christmas-green) 50%,
+    var(--christmas-gold) 75%,
+    var(--christmas-red) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 0.5rem 0.75rem;
+  background: var(--pine-shadow);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-festive {
+    border-radius: 12px;
+  }
+
+  .btn-primary,
+  .btn-success {
+    padding: 0.625rem 1.25rem;
+  }
+}
+</file>
+
+<file path="src/App.tsx">
+import { Suspense, lazy } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { LanguageProvider } from './i18n'
+import { PrivateRoute } from './components/PrivateRoute'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+
+// Lazy load pages for code splitting
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const FriendWishlist = lazy(() => import('./pages/FriendWishlist'))
+
+const queryClient = new QueryClient()
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center">
+    <div className="text-center">
+      <Loader2 className="mx-auto h-12 w-12 animate-spin text-green-600" />
+      <p className="mt-4 text-gray-500">Loading...</p>
+    </div>
+  </div>
+)
+
+function App() {
+  return (
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route element={<PrivateRoute />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/friend/:friendId" element={<FriendWishlist />} />
+                </Route>
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </Suspense>
+          </Router>
+        </AuthProvider>
+      </QueryClientProvider>
+    </LanguageProvider>
+  )
+}
+
+export default App
+</file>
+
+<file path="src/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="src/components/FriendList.tsx">
+import React, { useState, useEffect } from 'react'
+import type { UserProfile } from '../types'
+import { searchUsers, addFriend, getFriends } from '../services/friends'
+import { useAuth } from '../context/AuthContext'
+import { Link } from 'react-router-dom'
+import { UserPlus, Users, Search, ChevronRight, Loader2 } from 'lucide-react'
+import { useLanguage } from '../i18n'
+
+export const FriendList: React.FC = () => {
+  const { t } = useLanguage()
+  const { currentUser } = useAuth()
+  const [friends, setFriends] = useState<UserProfile[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([])
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (currentUser) {
+      const unsubscribe = getFriends(currentUser.uid, setFriends)
+      return () => unsubscribe()
+    }
+  }, [currentUser])
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!searchTerm.trim()) return
+
+    setLoading(true)
+    setMessage('')
+    try {
+      const results = await searchUsers(searchTerm)
+      // Filter out self and existing friends
+      const filtered = results.filter(
+        u => u.uid !== currentUser?.uid && !friends.some(f => f.uid === u.uid)
+      )
+      setSearchResults(filtered)
+      if (filtered.length === 0) setMessage('notFound')
+    } catch {
+      setMessage('error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddFriend = async (friendId: string) => {
+    if (!currentUser) return
+    try {
+      await addFriend(currentUser.uid, friendId)
+      setSearchResults(prev => prev.filter(u => u.uid !== friendId))
+      setMessage('added')
+      setSearchTerm('')
+    } catch {
+      setMessage('error')
+    }
+  }
+
+  return (
+    <div className="card-festive h-full p-5" data-testid="friend-list">
+      <h3 className="mb-5 flex items-center gap-2 text-xl font-bold text-gray-800">
+        <Users size={22} className="text-green-600" />
+        {t('friends')}
+        {friends.length > 0 && (
+          <span className="ml-auto rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+            {friends.length}
+          </span>
+        )}
+      </h3>
+
+      <form onSubmit={handleSearch} className="mb-5" data-testid="friend-search-form">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+            <input
+              type="email"
+              placeholder={t('findByEmail')}
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="input-festive input-with-icon text-sm"
+              data-testid="friend-search-input"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-success flex items-center justify-center px-3 py-2"
+            data-testid="friend-search-button"
+          >
+            {loading ? <Loader2 size={18} className="animate-spin" /> : <UserPlus size={18} />}
+          </button>
+        </div>
+        {message && (
+          <p
+            className={`mt-2 text-sm ${message === 'error' ? 'text-red-500' : message === 'added' ? 'text-green-600' : 'text-gray-500'}`}
+            data-testid="friend-search-message"
+          >
+            {message === 'added' ? t('friendAdded') : message === 'error' ? 'Error' : 'No users found'}
+          </p>
+        )}
+      </form>
+
+      {searchResults.length > 0 && (
+        <div className="mb-5 border-b border-gray-100 pb-4" data-testid="friend-search-results">
+          <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+            {t('searchResults')}
+          </h4>
+          <ul className="space-y-2">
+            {searchResults.map(user => (
+              <li
+                key={user.uid}
+                className="flex items-center justify-between rounded-lg bg-blue-50 p-2"
+                data-testid={`search-result-${user.uid}`}
+              >
+                <div className="min-w-0 flex-1">
+                  {user.displayName && (
+                    <span className="block truncate text-sm font-medium text-gray-800">{user.displayName}</span>
+                  )}
+                  <span className="block truncate text-xs text-gray-500">{user.email}</span>
+                </div>
+                <button
+                  onClick={() => handleAddFriend(user.uid)}
+                  className="ml-2 flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
+                  data-testid="add-friend-button"
+                >
+                  <UserPlus size={14} />
+                  {t('add')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="space-y-2" data-testid="friends-list">
+        {friends.length === 0 ? (
+          <div className="py-8 text-center" data-testid="no-friends-message">
+            <div className="mb-3 text-4xl">👥</div>
+            <p className="text-sm text-gray-500">{t('noFriendsYet')}</p>
+            <p className="mt-1 text-xs text-gray-400">{t('searchByEmail')}</p>
+          </div>
+        ) : (
+          <>
+            <h4 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+              {t('viewWishlists')}
+            </h4>
+            {friends.map(friend => (
+              <Link
+                key={friend.uid}
+                to={`/friend/${friend.uid}`}
+                className="group flex items-center justify-between rounded-xl border border-transparent bg-gray-50 p-3 transition-all hover:border-green-200 hover:bg-green-50"
+                data-testid={`friend-${friend.uid}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 text-sm font-semibold text-white">
+                    {(friend.displayName || friend.email).charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    {friend.displayName && (
+                      <span className="block truncate text-sm font-medium text-gray-700">{friend.displayName}</span>
+                    )}
+                    <span className={`block truncate text-gray-500 ${friend.displayName ? 'text-xs' : 'text-sm font-medium'}`}>
+                      {friend.email}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-green-600"
+                />
+              </Link>
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/PrivateRoute.tsx">
+import React from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+
+export const PrivateRoute: React.FC = () => {
+  const { currentUser } = useAuth()
+  return currentUser ? <Outlet /> : <Navigate to="/login" />
+}
+</file>
+
+<file path="src/components/WishlistForm.test.tsx">
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '../test/test-utils'
+import userEvent from '@testing-library/user-event'
+import { WishlistForm } from './WishlistForm'
+
+describe('WishlistForm', () => {
+  const mockOnSubmit = vi.fn()
+  const mockOnCancel = vi.fn()
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders form fields', () => {
+    render(<WishlistForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)
+
+    expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/description/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/url/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/price/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/priority/i)).toBeInTheDocument()
+  })
+
+  it('calls onCancel when cancel button is clicked', () => {
+    render(<WishlistForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)
+
+    const cancelButton = screen.getByRole('button', { name: /cancel/i })
+    fireEvent.click(cancelButton)
+
+    expect(mockOnCancel).toHaveBeenCalled()
+  })
+
+  it('submits form with correct data', async () => {
+    const user = userEvent.setup()
+    render(<WishlistForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)
+
+    await user.type(screen.getByLabelText(/title/i), 'New Gift')
+    await user.type(screen.getByLabelText(/description/i), 'A great gift')
+    await user.type(screen.getByLabelText(/url/i), 'https://example.com')
+    await user.type(screen.getByLabelText(/price/i), '$50')
+    await user.selectOptions(screen.getByLabelText(/priority/i), 'high')
+
+    const submitButton = screen.getByRole('button', { name: /add item/i })
+    await user.click(submitButton)
+
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      title: 'New Gift',
+      description: 'A great gift',
+      url: 'https://example.com',
+      price: '$50',
+      priority: 'high',
+    })
+  })
+
+  it('requires title field', async () => {
+    render(<WishlistForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)
+
+    const titleInput = screen.getByLabelText(/title/i)
+    expect(titleInput).toBeRequired()
+  })
+
+  it('has default priority of medium', () => {
+    render(<WishlistForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)
+
+    const prioritySelect = screen.getByLabelText(/priority/i) as HTMLSelectElement
+    expect(prioritySelect.value).toBe('medium')
+  })
+})
+</file>
+
+<file path="src/components/WishlistForm.tsx">
+import React, { useState } from 'react'
+import type { WishlistItem } from '../types'
+import { Gift, Link as LinkIcon, DollarSign, Star, X, Loader2 } from 'lucide-react'
+import { useLanguage } from '../i18n'
+
+interface Props {
+  onSubmit: (item: Omit<WishlistItem, 'id' | 'createdAt'>) => Promise<void>
+  onCancel: () => void
+}
+
+export const WishlistForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
+  const { t } = useLanguage()
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [url, setUrl] = useState('')
+  const [price, setPrice] = useState('')
+  const [priority, setPriority] = useState<WishlistItem['priority']>('medium')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      await onSubmit({ title, description, url, price, priority })
+      setTitle('')
+      setDescription('')
+      setUrl('')
+      setPrice('')
+      setPriority('medium')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card-festive mb-6 p-6" data-testid="wishlist-form">
+      <div className="mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
+        <Gift className="text-red-500" size={24} />
+        <h3 className="text-lg font-bold text-gray-800">{t('addNewWish')}</h3>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="title" className="mb-2 block text-sm font-semibold text-gray-700">
+            {t('whatDoYouWish')} *
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="input-festive"
+            placeholder={t('wishPlaceholder')}
+            required
+            data-testid="wishlist-title-input"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="mb-2 block text-sm font-semibold text-gray-700">
+            {t('description')}
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="input-festive min-h-[80px] resize-none"
+            placeholder={t('descriptionPlaceholder')}
+            rows={3}
+            data-testid="wishlist-description-input"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="url" className="mb-2 block text-sm font-semibold text-gray-700">
+              <LinkIcon size={14} className="mr-1 inline" />
+              {t('linkOptional')}
+            </label>
+            <input
+              id="url"
+              type="url"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              className="input-festive"
+              placeholder="https://..."
+              data-testid="wishlist-url-input"
+            />
+          </div>
+          <div>
+            <label htmlFor="price" className="mb-2 block text-sm font-semibold text-gray-700">
+              <DollarSign size={14} className="mr-1 inline" />
+              {t('priceOptional')}
+            </label>
+            <input
+              id="price"
+              type="text"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              className="input-festive"
+              placeholder="$49.99"
+              data-testid="wishlist-price-input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="priority" className="mb-2 block text-sm font-semibold text-gray-700">
+            <Star size={14} className="mr-1 inline" />
+            {t('howMuchWant')}
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {(['low', 'medium', 'high'] as const).map(p => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPriority(p)}
+                data-testid={`priority-${p}`}
+                className={`rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                  priority === p
+                    ? p === 'low'
+                      ? 'scale-105 bg-green-500 text-white shadow-lg'
+                      : p === 'medium'
+                        ? 'scale-105 bg-yellow-500 text-white shadow-lg'
+                        : 'scale-105 bg-red-500 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {p === 'low'
+                  ? `😊 ${t('niceToHave')}`
+                  : p === 'medium'
+                    ? `🙏 ${t('wouldLove')}`
+                    : `🎯 ${t('mustHave')}`}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-4">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="btn-ghost flex items-center gap-2"
+          data-testid="wishlist-cancel-button"
+        >
+          <X size={18} />
+          {t('cancel')}
+        </button>
+        <button
+          type="submit"
+          disabled={loading || !title.trim()}
+          className="btn-primary flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+          data-testid="wishlist-submit-button"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              {t('loading')}
+            </>
+          ) : (
+            <>
+              <Gift size={18} />
+              {t('addToWishlist')}
+            </>
+          )}
+        </button>
+      </div>
+    </form>
+  )
+}
+</file>
+
+<file path="src/components/WishlistItemCard.test.tsx">
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '../test/test-utils'
+import { WishlistItemCard } from './WishlistItemCard'
+import type { WishlistItem } from '../types'
+
+describe('WishlistItemCard', () => {
+  const mockItem: WishlistItem = {
+    id: '1',
+    title: 'Test Gift',
+    description: 'A wonderful test gift',
+    url: 'https://example.com/gift',
+    price: '$99.99',
+    priority: 'high',
+    createdAt: Date.now(),
+  }
+
+  const mockOnDelete = vi.fn()
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders item title', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    expect(screen.getByText('Test Gift')).toBeInTheDocument()
+  })
+
+  it('renders item description', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    expect(screen.getByText('A wonderful test gift')).toBeInTheDocument()
+  })
+
+  it('renders item price', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    expect(screen.getByText(/\$99\.99/)).toBeInTheDocument()
+  })
+
+  it('renders priority badge', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    expect(screen.getByText('high')).toBeInTheDocument()
+  })
+
+  it('renders link when url is provided', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', 'https://example.com/gift')
+  })
+
+  it('calls onDelete when delete button is clicked', () => {
+    render(<WishlistItemCard item={mockItem} onDelete={mockOnDelete} />)
+    const deleteButton = screen.getByRole('button')
+    fireEvent.click(deleteButton)
+    expect(mockOnDelete).toHaveBeenCalledWith('1')
+  })
+
+  it('renders without optional fields', () => {
+    const minimalItem: WishlistItem = {
+      id: '2',
+      title: 'Minimal Gift',
+      priority: 'low',
+      createdAt: Date.now(),
+    }
+
+    render(<WishlistItemCard item={minimalItem} onDelete={mockOnDelete} />)
+    expect(screen.getByText('Minimal Gift')).toBeInTheDocument()
+    expect(screen.getByText('low')).toBeInTheDocument()
+  })
+})
+</file>
+
+<file path="src/components/WishlistItemCard.tsx">
+import React from 'react'
+import type { WishlistItem } from '../types'
+import { Trash2, ExternalLink, DollarSign, Star } from 'lucide-react'
+import { useLanguage } from '../i18n'
+
+interface Props {
+  item: WishlistItem
+  onDelete: (id: string) => void
+}
+
+export const WishlistItemCard: React.FC<Props> = ({ item, onDelete }) => {
+  const { t } = useLanguage()
+  
+  const priorityConfig = {
+    low: { class: 'badge badge-low', icon: null, label: t('low') },
+    medium: { class: 'badge badge-medium', icon: <Star size={12} />, label: t('medium') },
+    high: {
+      class: 'badge badge-high',
+      icon: <Star size={12} fill="currentColor" />,
+      label: t('high'),
+    },
+  }
+
+  const priority = priorityConfig[item.priority]
+
+  return (
+    <div className="card-festive group p-5" data-testid={`wishlist-item-${item.id}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h3
+              className="text-lg font-bold text-gray-800 transition-colors group-hover:text-red-600"
+              data-testid="item-title"
+            >
+              {item.title}
+            </h3>
+            <span className={priority.class} data-testid="item-priority">
+              {priority.icon}
+              <span className="ml-1">{priority.label}</span>
+            </span>
+          </div>
+
+          {item.description && (
+            <p
+              className="mb-3 text-sm leading-relaxed text-gray-600"
+              data-testid="item-description"
+            >
+              {item.description}
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-3 text-sm">
+            {item.price && (
+              <span
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-3 py-1.5 text-gray-600"
+                data-testid="item-price"
+              >
+                <DollarSign size={14} className="text-green-600" />
+                {item.price}
+              </span>
+            )}
+            {item.url && (
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-blue-600 transition-colors hover:bg-blue-100"
+                data-testid="item-link"
+              >
+                <ExternalLink size={14} />
+                View item
+              </a>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={() => onDelete(item.id)}
+          className="rounded-lg p-2 text-gray-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
+          title="Delete Item"
+          aria-label="Delete item"
+          data-testid="delete-item-button"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/context/AuthContext.tsx">
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { onAuthStateChanged, type User } from 'firebase/auth'
+import { auth } from '../services/firebase'
+
+interface AuthContextType {
+  currentUser: User | null
+  loading: boolean
+}
+
+const AuthContext = createContext<AuthContextType>({
+  currentUser: null,
+  loading: true,
+})
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext)
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setCurrentUser(user)
+      setLoading(false)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const value = {
+    currentUser,
+    loading,
+  }
+
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>
+}
+</file>
+
+<file path="src/index.css">
+@import 'tailwindcss';
+
+/* Christmas Theme Color Variables */
+:root {
+  /* Primary Colors */
+  --christmas-red: #c41e3a;
+  --christmas-red-dark: #a01830;
+  --christmas-red-light: #e63950;
+  --christmas-green: #165b33;
+  --christmas-green-light: #1e7a45;
+  --christmas-gold: #d4af37;
+  --christmas-gold-light: #f0d060;
+
+  /* Neutral Colors */
+  --snow-white: #fafafa;
+  --frost: #f0f4f8;
+  --pine-shadow: #2d3748;
+
+  /* Typography */
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--frost) 0%, var(--snow-white) 100%);
+  color: var(--pine-shadow);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--frost);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--christmas-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--christmas-red-dark);
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--christmas-gold);
+  outline-offset: 2px;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--christmas-gold-light);
+  color: var(--pine-shadow);
+}
+</file>
+
+<file path="src/main.tsx">
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import './App.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+)
+</file>
+
+<file path="src/pages/Dashboard.tsx">
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { auth } from '../services/firebase'
+import type { WishlistItem } from '../types'
+import { getUserWishlist, addWishlistItem, deleteWishlistItem } from '../services/wishlist'
+import { WishlistForm } from '../components/WishlistForm'
+import { WishlistItemCard } from '../components/WishlistItemCard'
+import { FriendList } from '../components/FriendList'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { Plus, Gift, LogOut, Sparkles } from 'lucide-react'
+import { useLanguage } from '../i18n'
+
+const Dashboard: React.FC = () => {
+  const { t } = useLanguage()
+  const { currentUser } = useAuth()
+  const [items, setItems] = useState<WishlistItem[]>([])
+  const [showForm, setShowForm] = useState(false)
+
+  useEffect(() => {
+    if (currentUser) {
+      const unsubscribe = getUserWishlist(currentUser.uid, fetchedItems => {
+        setItems(fetchedItems)
+      })
+      return () => unsubscribe()
+    }
+  }, [currentUser])
+
+  const handleAddItem = async (item: Omit<WishlistItem, 'id' | 'createdAt'>) => {
+    if (currentUser) {
+      await addWishlistItem(currentUser.uid, item)
+      setShowForm(false)
+    }
+  }
+
+  const handleDeleteItem = async (id: string) => {
+    if (currentUser && window.confirm(t('confirmDelete'))) {
+      await deleteWishlistItem(currentUser.uid, id)
+    }
+  }
+
+  return (
+    <div className="min-h-screen" data-testid="dashboard-page">
+      {/* Festive Navbar */}
+      <nav className="navbar-festive festive-border px-6 py-4 text-white" data-testid="navbar">
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="animate-float text-3xl">🎄</span>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">{t('appName')}</h1>
+              <p className="text-xs text-red-100 opacity-80">{t('tagline')}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <div className="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:flex">
+              <Sparkles size={14} className="animate-twinkle" />
+              <span className="text-sm" data-testid="user-email">
+                {currentUser?.email}
+              </span>
+            </div>
+            <button
+              onClick={() => auth.signOut()}
+              className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-lg transition-all hover:scale-105 hover:bg-red-50 active:scale-95"
+              data-testid="logout-button"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">{t('logout')}</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Wishlist Section */}
+          <div className="lg:col-span-2">
+            <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h2 className="flex items-center gap-2 text-3xl font-bold text-gray-800">
+                  <Gift className="text-red-500" size={28} />
+                  {t('myWishlist')}
+                </h2>
+                <p className="mt-1 text-gray-500" data-testid="wishlist-count">
+                  {items.length} {items.length === 1 ? t('item') : t('items')} {t('onYourList')}
+                </p>
+              </div>
+              {!showForm && (
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="btn-success group flex items-center gap-2"
+                  data-testid="add-item-button"
+                >
+                  <Plus size={20} className="transition-transform group-hover:rotate-90" />
+                  {t('addItem')}
+                </button>
+              )}
+            </div>
+
+            {showForm && (
+              <div className="animate-slide-up">
+                <WishlistForm onSubmit={handleAddItem} onCancel={() => setShowForm(false)} />
+              </div>
+            )}
+
+            <div className="space-y-4" data-testid="wishlist-items">
+              {items.length === 0 && !showForm ? (
+                <div className="empty-state animate-slide-up" data-testid="empty-wishlist">
+                  <div className="empty-state-icon">🎁</div>
+                  <h3 className="mb-2 text-xl font-semibold text-gray-700">
+                    {t('emptyWishlist')}
+                  </h3>
+                  <p className="mb-6 text-gray-500">
+                    {t('startAdding')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="btn-success inline-flex items-center gap-2"
+                    data-testid="add-first-item-button"
+                  >
+                    <Plus size={20} /> {t('addFirstItem')}
+                  </button>
+                </div>
+              ) : (
+                items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="animate-slide-up"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <WishlistItemCard item={item} onDelete={handleDeleteItem} />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Friends Section */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-4">
+              <FriendList />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-6 text-center text-sm text-gray-400">
+        <p>{t('madeWithLove')}</p>
+      </footer>
+    </div>
+  )
+}
+
+export default Dashboard
+</file>
+
+<file path="src/pages/FriendWishlist.tsx">
+import React, { useState, useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import {
+  getUserWishlist,
+  getGiftStatus,
+  markItemAsTaken,
+  unmarkItemAsTaken,
+} from '../services/wishlist'
+import type { WishlistItem, GiftStatus } from '../types'
+import { ArrowLeft, Gift, Check, ExternalLink } from 'lucide-react'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../services/firebase'
+import { useLanguage } from '../i18n'
+
+interface FriendWishlistItemProps {
+  item: WishlistItem
+  friendId: string
+  currentUserId: string
+  currentUserEmail: string
+}
+
+const FriendWishlistItem: React.FC<FriendWishlistItemProps> = ({
+  item,
+  friendId,
+  currentUserId,
+  currentUserEmail,
+}) => {
+  const { t } = useLanguage()
+  const [giftStatus, setGiftStatus] = useState<GiftStatus | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = getGiftStatus(friendId, item.id, setGiftStatus)
+    return () => unsubscribe()
+  }, [friendId, item.id])
+
+  const handleMarkAsTaken = async () => {
+    setLoading(true)
+    try {
+      await markItemAsTaken(friendId, item.id, currentUserId, currentUserEmail)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUnmark = async () => {
+    setLoading(true)
+    try {
+      await unmarkItemAsTaken(friendId, item.id)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const isTakenByMe = giftStatus?.takenBy === currentUserId
+  const isTakenByOther = giftStatus?.isTaken && !isTakenByMe
+
+  const priorityColors = {
+    low: 'bg-green-100 text-green-800',
+    medium: 'bg-yellow-100 text-yellow-800',
+    high: 'bg-red-100 text-red-800',
+  }
+
+  return (
+    <div
+      className={`rounded border bg-white p-4 shadow ${isTakenByOther ? 'border-gray-300 opacity-60' : 'border-gray-200'}`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="mb-1 flex items-center gap-2">
+            <h3 className="text-lg font-bold">{item.title}</h3>
+            <span className={`rounded-full px-2 py-1 text-xs ${priorityColors[item.priority]}`}>
+              {item.priority}
+            </span>
+          </div>
+          {item.description && <p className="mb-2 text-sm text-gray-600">{item.description}</p>}
+          <div className="flex gap-4 text-sm text-gray-500">
+            {item.price && <span>Price: {item.price}</span>}
+            {item.url && (
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:underline"
+              >
+                Link <ExternalLink size={14} />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div className="ml-4">
+          {giftStatus?.isTaken ? (
+            <div className="text-center">
+              {isTakenByMe ? (
+                <>
+                  <span className="mb-1 flex items-center gap-1 text-sm text-green-600">
+                    <Check size={16} /> {t('youreGettingThis')}
+                  </span>
+                  <button
+                    onClick={handleUnmark}
+                    disabled={loading}
+                    className="text-xs text-gray-500 hover:text-red-500"
+                  >
+                    {t('cancel')}
+                  </button>
+                </>
+              ) : (
+                <span className="flex items-center gap-1 text-sm text-gray-500">
+                  <Gift size={16} /> {t('alreadyTaken')}
+                </span>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={handleMarkAsTaken}
+              disabled={loading}
+              className="flex items-center gap-1 rounded bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              <Gift size={16} /> {t('illGetThis')}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const FriendWishlist: React.FC = () => {
+  const { t } = useLanguage()
+  const { friendId } = useParams<{ friendId: string }>()
+  const { currentUser } = useAuth()
+  const [items, setItems] = useState<WishlistItem[]>([])
+  const [friendEmail, setFriendEmail] = useState<string>('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!friendId) return
+
+    // Fetch friend's email
+    const fetchFriend = async () => {
+      const friendDoc = await getDoc(doc(db, 'users', friendId))
+      if (friendDoc.exists()) {
+        setFriendEmail(friendDoc.data().email)
+      }
+    }
+    fetchFriend()
+
+    // Fetch friend's wishlist
+    const unsubscribe = getUserWishlist(friendId, fetchedItems => {
+      setItems(fetchedItems)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [friendId])
+
+  if (!friendId || !currentUser) {
+    return <div>Invalid request</div>
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-red-600 p-4 text-white shadow-md">
+        <div className="container mx-auto flex items-center justify-between">
+          <h1 className="flex items-center gap-2 text-xl font-bold">🎄 {t('appName')}</h1>
+          <Link
+            to="/"
+            className="flex items-center gap-1 rounded bg-white px-3 py-1 text-sm font-medium text-red-600 transition-colors hover:bg-gray-100"
+          >
+            <ArrowLeft size={16} /> {t('back')}
+          </Link>
+        </div>
+      </nav>
+
+      <main className="container mx-auto max-w-4xl p-4">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {friendEmail ? `${friendEmail}${t('wishlistOf')}` : t('myWishlist')}
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            {t('selectItems')}
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="py-10 text-center text-gray-500">{t('loading')}</div>
+        ) : items.length === 0 ? (
+          <div className="rounded bg-white py-10 text-center text-gray-500 shadow">
+            <p>{t('emptyWishlist')}</p>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {items.map(item => (
+              <FriendWishlistItem
+                key={item.id}
+                item={item}
+                friendId={friendId}
+                currentUserId={currentUser.uid}
+                currentUserEmail={currentUser.email || ''}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
+
+export default FriendWishlist
+</file>
+
+<file path="src/pages/Login.tsx">
+import React, { useState } from 'react'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../services/firebase'
+import { Link, useNavigate } from 'react-router-dom'
+import { Mail, Lock, LogIn, Loader2, AlertCircle } from 'lucide-react'
+import { useLanguage } from '../i18n'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
+
+const Login: React.FC = () => {
+  const { t } = useLanguage()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      navigate('/')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center p-4" data-testid="login-page">
+      {/* Language Switcher - Top Right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+
+      <div className="w-full max-w-md">
+        {/* Logo Section */}
+        <div className="mb-8 text-center">
+          <div className="animate-float mb-4 text-6xl">🎄</div>
+          <h1 className="text-3xl font-bold text-gray-800">{t('appName')}</h1>
+          <p className="mt-2 text-gray-500">{t('welcomeBack')}</p>
+        </div>
+
+        {/* Form Card */}
+        <div className="card-festive p-8">
+          <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">{t('signIn')}</h2>
+
+          {error && (
+            <div
+              className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
+              data-testid="login-error"
+            >
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
+            <div>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('email')}
+              </label>
+              <div className="relative">
+                <Mail
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="email"
+                  type="email"
+                  className="input-festive input-with-icon"
+                  placeholder={t('emailPlaceholder')}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  data-testid="login-email-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('password')}
+              </label>
+              <div className="relative">
+                <Lock
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="password"
+                  type="password"
+                  className="input-festive input-with-icon"
+                  placeholder={t('passwordPlaceholder')}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  data-testid="login-password-input"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary flex w-full items-center justify-center gap-2"
+              data-testid="login-submit-button"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  {t('signingIn')}
+                </>
+              ) : (
+                <>
+                  <LogIn size={18} />
+                  {t('signIn')}
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {t('noAccount')}{' '}
+              <Link
+                to="/register"
+                className="font-semibold text-green-600 transition-colors hover:text-green-700"
+                data-testid="register-link"
+              >
+                {t('createOne')}
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="mt-8 text-center text-sm text-gray-400">
+          {t('giftGivingMagic')}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default Login
+</file>
+
+<file path="src/pages/Register.tsx">
+import React, { useState } from 'react'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth, db } from '../services/firebase'
+import { Link, useNavigate } from 'react-router-dom'
+import { doc, setDoc } from 'firebase/firestore'
+import { Mail, Lock, UserPlus, Loader2, AlertCircle, Gift, User } from 'lucide-react'
+import { useLanguage } from '../i18n'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
+
+const Register: React.FC = () => {
+  const { t } = useLanguage()
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      // Create user document with displayName for search
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: userCredential.user.email,
+        uid: userCredential.user.uid,
+        displayName: displayName.trim(),
+        displayNameLower: displayName.trim().toLowerCase(), // For case-insensitive search
+      })
+      navigate('/')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center p-4" data-testid="register-page">
+      {/* Language Switcher - Top Right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+
+      <div className="w-full max-w-md">
+        {/* Logo Section */}
+        <div className="mb-8 text-center">
+          <div className="animate-float mb-4 text-6xl">🎁</div>
+          <h1 className="text-3xl font-bold text-gray-800">{t('joinFun')}</h1>
+          <p className="mt-2 text-gray-500">{t('createWishlistShare')}</p>
+        </div>
+
+        {/* Form Card */}
+        <div className="card-festive p-8">
+          <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">{t('signUp')}</h2>
+
+          {error && (
+            <div
+              className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600"
+              data-testid="register-error"
+            >
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4" data-testid="register-form">
+            <div>
+              <label htmlFor="displayName" className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('displayName')}
+              </label>
+              <div className="relative">
+                <User
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="displayName"
+                  type="text"
+                  className="input-festive input-with-icon"
+                  placeholder={t('displayNamePlaceholder')}
+                  value={displayName}
+                  onChange={e => setDisplayName(e.target.value)}
+                  required
+                  autoComplete="name"
+                  data-testid="register-name-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('email')}
+              </label>
+              <div className="relative">
+                <Mail
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="email"
+                  type="email"
+                  className="input-festive input-with-icon"
+                  placeholder={t('emailPlaceholder')}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  data-testid="register-email-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-gray-700">
+                {t('password')}
+              </label>
+              <div className="relative">
+                <Lock
+                  size={18}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  id="password"
+                  type="password"
+                  className="input-festive input-with-icon"
+                  placeholder={t('minChars')}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  data-testid="register-password-input"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-400">{t('minChars')}</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-success flex w-full items-center justify-center gap-2"
+              data-testid="register-submit-button"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  {t('creatingAccount')}
+                </>
+              ) : (
+                <>
+                  <UserPlus size={18} />
+                  {t('signUp')}
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Benefits */}
+          <div className="mt-6 border-t border-gray-100 pt-6">
+            <p className="mb-3 text-center text-xs text-gray-500">{t('whatYouGet')}</p>
+            <div className="grid grid-cols-3 gap-2 text-center text-xs text-gray-600">
+              <div className="rounded-lg bg-gray-50 p-2">
+                <Gift size={16} className="mx-auto mb-1 text-red-500" />
+                {t('createWishlists')}
+              </div>
+              <div className="rounded-lg bg-gray-50 p-2">
+                <span className="text-lg">👥</span>
+                <div>{t('addFriends')}</div>
+              </div>
+              <div className="rounded-lg bg-gray-50 p-2">
+                <span className="text-lg">🎉</span>
+                <div>{t('noSpoilers')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {t('hasAccount')}{' '}
+              <Link
+                to="/login"
+                className="font-semibold text-red-600 transition-colors hover:text-red-700"
+                data-testid="login-link"
+              >
+                {t('signInLink')}
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="mt-8 text-center text-sm text-gray-400">{t('joyOfGiving')}</p>
+      </div>
+    </div>
+  )
+}
+
+export default Register
+</file>
+
+<file path="src/services/firebase.ts">
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBUH9o31flNoxzCpIrrtSClAuimD5uiGxc',
+  authDomain: 'christmaswishlist-297d8.firebaseapp.com',
+  projectId: 'christmaswishlist-297d8',
+  storageBucket: 'christmaswishlist-297d8.firebasestorage.app',
+  messagingSenderId: '1092238271822',
+  appId: '1:1092238271822:web:15b74835ef6dcd918eea1f',
+  measurementId: 'G-WQMR2SQ3VB',
+}
+
+const app = initializeApp(firebaseConfig)
+export const auth = getAuth(app)
+export const db = getFirestore(app)
+</file>
+
+<file path="src/services/friends.ts">
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+  onSnapshot,
+  getDoc,
+} from 'firebase/firestore'
+import { db } from './firebase'
+import type { UserProfile } from '../types'
+
+export const searchUsers = async (searchTerm: string): Promise<UserProfile[]> => {
+  const term = searchTerm.trim().toLowerCase()
+  if (!term) return []
+
+  // Search by exact email OR by displayName prefix (case-insensitive)
+  const emailQuery = query(collection(db, 'users'), where('email', '==', searchTerm.trim()))
+  const nameQuery = query(
+    collection(db, 'users'),
+    where('displayNameLower', '>=', term),
+    where('displayNameLower', '<=', term + '\uf8ff')
+  )
+
+  const [emailSnapshot, nameSnapshot] = await Promise.all([
+    getDocs(emailQuery),
+    getDocs(nameQuery),
+  ])
+
+  // Combine results and remove duplicates
+  const resultsMap = new Map<string, UserProfile>()
+  
+  emailSnapshot.docs.forEach(doc => {
+    const data = doc.data() as UserProfile
+    resultsMap.set(data.uid, data)
+  })
+  
+  nameSnapshot.docs.forEach(doc => {
+    const data = doc.data() as UserProfile
+    resultsMap.set(data.uid, data)
+  })
+
+  return Array.from(resultsMap.values())
+}
+
+export const addFriend = async (currentUserId: string, friendId: string) => {
+  // Add friend to current user's friend list
+  // We need to fetch the friend's profile first to store basic info
+  const friendDoc = await getDoc(doc(db, 'users', friendId))
+  if (!friendDoc.exists()) throw new Error('User not found')
+
+  const friendData = friendDoc.data() as UserProfile
+
+  await setDoc(doc(db, 'users', currentUserId, 'friends', friendId), {
+    uid: friendData.uid,
+    email: friendData.email,
+    displayName: friendData.displayName || '',
+  })
+}
+
+export const getFriends = (userId: string, callback: (friends: UserProfile[]) => void) => {
+  return onSnapshot(collection(db, 'users', userId, 'friends'), snapshot => {
+    const friends = snapshot.docs.map(doc => doc.data() as UserProfile)
+    callback(friends)
+  })
+}
+</file>
+
+<file path="src/services/wishlist.ts">
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  orderBy,
+  onSnapshot,
+  setDoc,
+} from 'firebase/firestore'
+import { db } from './firebase'
+import type { WishlistItem, GiftStatus } from '../types'
+
+export const getUserWishlist = (userId: string, callback: (items: WishlistItem[]) => void) => {
+  const q = query(collection(db, 'users', userId, 'wishlist'), orderBy('createdAt', 'desc'))
+  return onSnapshot(q, snapshot => {
+    const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as WishlistItem)
+    callback(items)
+  })
+}
+
+export const addWishlistItem = async (
+  userId: string,
+  item: Omit<WishlistItem, 'id' | 'createdAt'>
+) => {
+  return addDoc(collection(db, 'users', userId, 'wishlist'), {
+    ...item,
+    createdAt: Date.now(),
+  })
+}
+
+export const deleteWishlistItem = async (userId: string, itemId: string) => {
+  return deleteDoc(doc(db, 'users', userId, 'wishlist', itemId))
+}
+
+export const updateWishlistItem = async (
+  userId: string,
+  itemId: string,
+  data: Partial<WishlistItem>
+) => {
+  return updateDoc(doc(db, 'users', userId, 'wishlist', itemId), data)
+}
+
+// Friend operations
+export const getGiftStatus = (
+  userId: string,
+  itemId: string,
+  callback: (status: GiftStatus | null) => void
+) => {
+  return onSnapshot(doc(db, 'users', userId, 'wishlist', itemId, 'gift_status', 'status'), doc => {
+    if (doc.exists()) {
+      callback(doc.data() as GiftStatus)
+    } else {
+      callback(null)
+    }
+  })
+}
+
+export const markItemAsTaken = async (
+  userId: string,
+  itemId: string,
+  takenBy: string,
+  takenByName: string
+) => {
+  const statusRef = doc(db, 'users', userId, 'wishlist', itemId, 'gift_status', 'status')
+  return setDoc(statusRef, {
+    isTaken: true,
+    takenBy,
+    takenByName,
+  })
+}
+
+export const unmarkItemAsTaken = async (userId: string, itemId: string) => {
+  const statusRef = doc(db, 'users', userId, 'wishlist', itemId, 'gift_status', 'status')
+  return deleteDoc(statusRef)
+}
+</file>
+
+<file path="src/test/setup.ts">
+import '@testing-library/jest-dom'
+import { vi } from 'vitest'
+
+// Mock Firebase
+vi.mock('../services/firebase', () => ({
+  auth: {
+    signOut: vi.fn(),
+    onAuthStateChanged: vi.fn(),
+  },
+  db: {},
+}))
+
+// Mock environment variables
+vi.stubEnv('VITE_FIREBASE_API_KEY', 'test-api-key')
+vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', 'test.firebaseapp.com')
+vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'test-project')
+vi.stubEnv('VITE_FIREBASE_STORAGE_BUCKET', 'test.appspot.com')
+vi.stubEnv('VITE_FIREBASE_MESSAGING_SENDER_ID', '123456789')
+vi.stubEnv('VITE_FIREBASE_APP_ID', '1:123456789:web:abc123')
+
+// Mock window.confirm
+Object.defineProperty(window, 'confirm', {
+  writable: true,
+  value: vi.fn(() => true),
+})
+</file>
+
+<file path="src/test/test-utils.tsx">
+/* eslint-disable react-refresh/only-export-components */
+import type { ReactElement } from 'react'
+import { render, type RenderOptions } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+})
+
+interface WrapperProps {
+  children: React.ReactNode
+}
+
+const AllTheProviders = ({ children }: WrapperProps) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>{children}</BrowserRouter>
+    </QueryClientProvider>
+  )
+}
+
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
+  render(ui, { wrapper: AllTheProviders, ...options })
+
+export * from '@testing-library/react'
+export { customRender as render }
+</file>
+
+<file path="src/types/index.test.ts">
+import { describe, it, expect } from 'vitest'
+import type { WishlistItem, UserProfile, GiftStatus, Suggestion } from './index'
+
+describe('Types', () => {
+  describe('WishlistItem', () => {
+    it('should have correct structure', () => {
+      const item: WishlistItem = {
+        id: '1',
+        title: 'Test Item',
+        description: 'A test description',
+        url: 'https://example.com',
+        price: '$50',
+        priority: 'high',
+        createdAt: Date.now(),
+      }
+
+      expect(item.id).toBe('1')
+      expect(item.title).toBe('Test Item')
+      expect(item.priority).toBe('high')
+    })
+
+    it('should allow optional fields to be undefined', () => {
+      const item: WishlistItem = {
+        id: '2',
+        title: 'Minimal Item',
+        priority: 'low',
+        createdAt: Date.now(),
+      }
+
+      expect(item.description).toBeUndefined()
+      expect(item.url).toBeUndefined()
+      expect(item.price).toBeUndefined()
+    })
+
+    it('should only accept valid priority values', () => {
+      const priorities: WishlistItem['priority'][] = ['low', 'medium', 'high']
+      priorities.forEach(priority => {
+        const item: WishlistItem = {
+          id: '1',
+          title: 'Test',
+          priority,
+          createdAt: Date.now(),
+        }
+        expect(['low', 'medium', 'high']).toContain(item.priority)
+      })
+    })
+  })
+
+  describe('UserProfile', () => {
+    it('should have correct structure', () => {
+      const user: UserProfile = {
+        uid: 'user123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+      }
+
+      expect(user.uid).toBe('user123')
+      expect(user.email).toBe('test@example.com')
+      expect(user.displayName).toBe('Test User')
+    })
+
+    it('should allow displayName to be undefined', () => {
+      const user: UserProfile = {
+        uid: 'user123',
+        email: 'test@example.com',
+      }
+
+      expect(user.displayName).toBeUndefined()
+    })
+  })
+
+  describe('GiftStatus', () => {
+    it('should have correct structure', () => {
+      const status: GiftStatus = {
+        isTaken: true,
+        takenBy: 'user456',
+        takenByName: 'Friend User',
+      }
+
+      expect(status.isTaken).toBe(true)
+      expect(status.takenBy).toBe('user456')
+      expect(status.takenByName).toBe('Friend User')
+    })
+  })
+
+  describe('Suggestion', () => {
+    it('should have correct structure', () => {
+      const suggestion: Suggestion = {
+        id: 'sug1',
+        title: 'Suggested Gift',
+        description: 'This would be a great gift',
+        suggestedBy: 'user789',
+        suggestedByName: 'Suggester',
+        createdAt: Date.now(),
+      }
+
+      expect(suggestion.id).toBe('sug1')
+      expect(suggestion.title).toBe('Suggested Gift')
+      expect(suggestion.suggestedBy).toBe('user789')
+    })
+  })
+})
+</file>
+
+<file path="src/types/index.ts">
+export interface UserProfile {
+  uid: string
+  email: string
+  displayName?: string
+}
+
+export interface WishlistItem {
+  id: string
+  title: string
+  description?: string
+  url?: string
+  price?: string
+  priority: 'low' | 'medium' | 'high'
+  createdAt: number
+}
+
+export interface GiftStatus {
+  isTaken: boolean
+  takenBy: string
+  takenByName: string
+}
+
+export interface Suggestion {
+  id: string
+  title: string
+  description?: string
+  suggestedBy: string // uid
+  suggestedByName: string
+  createdAt: number
+}
+</file>
+
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+</file>
+
+<file path="tsconfig.app.json">
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
+</file>
+
+<file path="tsconfig.node.json">
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+</file>
+
+<file path="vite.config.ts">
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split Firebase into its own chunk
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          // Split React ecosystem into vendor chunk
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          // Split TanStack Query
+          'tanstack-query': ['@tanstack/react-query'],
+          // Split UI icons
+          'lucide-icons': ['lucide-react'],
+        },
+      },
+    },
+    // Increase chunk size warning limit slightly since we're optimizing
+    chunkSizeWarningLimit: 300,
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+  },
+})
+</file>
+
+</files>

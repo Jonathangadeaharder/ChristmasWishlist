@@ -326,3 +326,90 @@
     padding: 0.625rem 1.25rem;
   }
 }
+
+/* ========================================
+   Accessibility: Reduced Motion
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all animations for users who prefer reduced motion */
+  .animate-float,
+  .animate-shimmer,
+  .animate-twinkle,
+  .animate-slide-up,
+  .animate-spin,
+  .snowflake,
+  .spinner,
+  .festive-border::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable hover transforms */
+  .card-festive:hover,
+  .btn-primary:hover,
+  .btn-success:hover {
+    transform: none;
+  }
+
+  /* Keep essential visual feedback without animation */
+  .card-festive:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+}
+
+/* ========================================
+   Accessibility: Focus States
+   ======================================== */
+/* Ensure visible focus indicators for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ========================================
+   Accessibility: Color Contrast Improvements
+   ======================================== */
+/* Ensure sufficient contrast for text */
+.text-gray-400 {
+  color: #6b7280; /* Darker gray for better contrast */
+}
+
+.text-gray-500 {
+  color: #4b5563; /* Darker gray for better contrast */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card-festive {
+    border: 2px solid #000;
+  }
+
+  .btn-primary,
+  .btn-success {
+    border: 2px solid #000;
+  }
+
+  .badge {
+    border: 1px solid currentColor;
+  }
+}
