@@ -14,10 +14,21 @@ export interface WishlistItem {
   createdAt: number
 }
 
+export interface GiftContributor {
+  uid: string
+  name: string
+  status: 'confirmed' | 'pending' // pending = invited but not yet accepted
+  joinedAt: number
+}
+
 export interface GiftStatus {
   isTaken: boolean
-  takenBy: string
+  takenBy: string // Primary contributor (who initiated)
   takenByName: string
+  // Gift splitting support
+  isSplit?: boolean
+  contributors?: GiftContributor[]
+  splitRequestOpen?: boolean // Whether primary is looking for people to split with
 }
 
 export interface Suggestion {

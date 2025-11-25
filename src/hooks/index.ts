@@ -18,4 +18,12 @@ export {
 export type { FriendError, FriendErrorCode } from './useFriends'
 
 // Gift status hooks
-export { useGiftStatus, useMarkItemAsTaken, useUnmarkItemAsTaken } from './useGiftStatus'
+export {
+  useGiftStatus,
+  useMarkItemAsTaken,
+  useUnmarkItemAsTaken,
+  useToggleSplitRequest,
+  useRequestToJoinSplit,
+  useConfirmContributor,
+  useRemoveContributor,
+} from './useGiftStatus'

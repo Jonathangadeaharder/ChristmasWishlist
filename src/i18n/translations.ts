@@ -78,6 +78,20 @@ export const translations = {
     youreGettingThis: "You're getting this!",
     alreadyTaken: 'Already taken',
 
+    // Gift Splitting
+    lookingForSplit: 'Looking for co-gifters',
+    splitThisGift: 'Split this gift?',
+    requestToJoin: 'Join split',
+    pendingApproval: 'Pending approval',
+    confirmJoin: 'Confirm',
+    removeContributor: 'Remove',
+    leaveSplit: 'Leave split',
+    contributors: 'Contributors',
+    splitWith: 'Split with others',
+    stopLookingForSplit: 'Stop looking',
+    youJoined: 'You joined this split!',
+    waitingForApproval: 'Waiting for approval...',
+
     // Features
     createWishlists: 'Create wishlists',
     addFriends: 'Add friends',
@@ -174,6 +188,20 @@ export const translations = {
     youreGettingThis: 'Du schenkst das!',
     alreadyTaken: 'Bereits vergeben',
 
+    // Gift Splitting
+    lookingForSplit: 'Suche Mitschenker',
+    splitThisGift: 'Geschenk teilen?',
+    requestToJoin: 'Mitmachen',
+    pendingApproval: 'Warte auf Bestätigung',
+    confirmJoin: 'Bestätigen',
+    removeContributor: 'Entfernen',
+    leaveSplit: 'Verlassen',
+    contributors: 'Mitschenker',
+    splitWith: 'Mit anderen teilen',
+    stopLookingForSplit: 'Suche beenden',
+    youJoined: 'Du bist dabei!',
+    waitingForApproval: 'Warte auf Bestätigung...',
+
     // Features
     createWishlists: 'Wunschzettel erstellen',
     addFriends: 'Freunde hinzufügen',
@@ -269,6 +297,20 @@ export const translations = {
     illGetThis: '¡Yo lo regalo!',
     youreGettingThis: '¡Lo vas a regalar!',
     alreadyTaken: 'Ya reservado',
+
+    // Gift Splitting
+    lookingForSplit: 'Buscando co-regaladores',
+    splitThisGift: '¿Dividir este regalo?',
+    requestToJoin: 'Unirse',
+    pendingApproval: 'Pendiente de aprobación',
+    confirmJoin: 'Confirmar',
+    removeContributor: 'Eliminar',
+    leaveSplit: 'Abandonar',
+    contributors: 'Contribuidores',
+    splitWith: 'Dividir con otros',
+    stopLookingForSplit: 'Dejar de buscar',
+    youJoined: '¡Te uniste!',
+    waitingForApproval: 'Esperando aprobación...',
 
     // Features
     createWishlists: 'Crear listas',

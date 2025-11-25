@@ -58,6 +58,31 @@ export interface IGiftStatusRepository {
    * Unmark an item (remove taken status)
    */
   unmark(userId: string, itemId: string): Promise<void>
+
+  /**
+   * Open or close split request for a gift
+   */
+  toggleSplitRequest(userId: string, itemId: string, open: boolean): Promise<void>
+
+  /**
+   * Request to join a split (as a pending contributor)
+   */
+  requestToJoinSplit(
+    userId: string,
+    itemId: string,
+    contributorId: string,
+    contributorName: string
+  ): Promise<void>
+
+  /**
+   * Confirm a pending contributor
+   */
+  confirmContributor(userId: string, itemId: string, contributorId: string): Promise<void>
+
+  /**
+   * Remove a contributor (or leave the split)
+   */
+  removeContributor(userId: string, itemId: string, contributorId: string): Promise<void>
 }
 
 /**
