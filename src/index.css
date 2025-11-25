@@ -1,0 +1,68 @@
+@import 'tailwindcss';
+
+/* Christmas Theme Color Variables */
+:root {
+  /* Primary Colors */
+  --christmas-red: #c41e3a;
+  --christmas-red-dark: #a01830;
+  --christmas-red-light: #e63950;
+  --christmas-green: #165b33;
+  --christmas-green-light: #1e7a45;
+  --christmas-gold: #d4af37;
+  --christmas-gold-light: #f0d060;
+
+  /* Neutral Colors */
+  --snow-white: #fafafa;
+  --frost: #f0f4f8;
+  --pine-shadow: #2d3748;
+
+  /* Typography */
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--frost) 0%, var(--snow-white) 100%);
+  color: var(--pine-shadow);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--frost);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--christmas-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--christmas-red-dark);
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--christmas-gold);
+  outline-offset: 2px;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--christmas-gold-light);
+  color: var(--pine-shadow);
+}

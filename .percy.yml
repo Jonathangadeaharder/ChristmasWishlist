@@ -1,0 +1,53 @@
+# Percy Configuration
+# https://www.browserstack.com/docs/percy/take-percy-snapshots/configuration
+
+version: 2
+
+# Snapshot configuration
+snapshot:
+  # Default widths for responsive testing
+  widths:
+    - 375   # Mobile
+    - 768   # Tablet
+    - 1280  # Desktop
+  
+  # Minimum height for snapshots
+  min-height: 1024
+  
+  # Enable JavaScript for dynamic content
+  enable-javascript: true
+  
+  # Percy CSS to inject (hide dynamic elements)
+  percy-css: |
+    /* Hide elements that change between runs */
+    .animate-spin {
+      animation: none !important;
+    }
+    .animate-float {
+      animation: none !important;
+    }
+    /* Ensure consistent rendering */
+    * {
+      transition: none !important;
+      animation-duration: 0s !important;
+    }
+
+# Upload configuration
+upload:
+  # Number of concurrent uploads
+  concurrency: 2
+
+# Discovery configuration  
+discovery:
+  # Network idle timeout
+  network-idle-timeout: 100
+  
+  # Allowed hostnames
+  allowed-hostnames:
+    - localhost
+    - 127.0.0.1
+
+# Comparison settings
+comparison:
+  # Enable responsive diffs
+  responsive-diffs: true
